@@ -154,6 +154,7 @@ const CodeEditor = () => {
           {compilationMessage && <pre>{compilationMessage}</pre>}
           {error && <pre>{error}</pre>}
           {!error && <pre>{output}</pre>}
+          
         </div>
       </div>
         </div>
