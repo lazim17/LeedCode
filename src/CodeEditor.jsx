@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import MonacoEditor from "react-monaco-editor";
 import axios from "axios";
 import "./CodeEditor.css";
+import * as monaco from 'monaco-editor';
 
 const CodeEditor = () => {
   const [code, setCode] = useState("");
@@ -11,6 +12,19 @@ const CodeEditor = () => {
   const [compilationMessage, setCompilationMessage] = useState("");
 
   const baseURL = "http://localhost:5000";
+
+  monaco.editor.defineTheme('myTheme', {
+    base: 'vs', // Use the 'vs' as the base theme
+    inherit: true, // Inherit styles from the base theme
+    rules: [
+      { token: 'comment', foreground: '008000' }, // Define the color for comments
+      { token: 'string', foreground: '800000' },  // Define the color for strings
+      // Add more token rules as needed
+    ],
+    colors: {
+      'editor.background': '#B9C2C6', // Set the editor background color
+    },
+  });
 
   const compileCode = async () => {
     if (selectedLanguage) {
@@ -81,6 +95,15 @@ const CodeEditor = () => {
       </nav>
       <div className="canvas">
         <div className="question-container">
+        <div className="question-sidebar">
+              <button>1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>4</button>
+              <button>5</button>
+              <button>6</button>
+          </div>
+          <div className="question">
           <h3>Question Title</h3>
           <h4>Problem</h4>
           <p>
@@ -112,6 +135,7 @@ const CodeEditor = () => {
             sums of its diagonals. For example, the square matrix is shown
             below:
           </p>
+          </div>
         </div>
         <div>
         <div className="editor-container">
@@ -132,7 +156,7 @@ const CodeEditor = () => {
           <div className="editor-content">
             <MonacoEditor
               language={selectedLanguage}
-              theme="vs-dark"
+              theme="myTheme"
               value={code}
               options={editorOptions}
               height= "35vh"
@@ -154,7 +178,7 @@ const CodeEditor = () => {
           {compilationMessage && <pre>{compilationMessage}</pre>}
           {error && <pre>{error}</pre>}
           {!error && <pre>{output}</pre>}
-          
+
         </div>
       </div>
         </div>
