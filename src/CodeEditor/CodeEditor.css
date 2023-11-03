@@ -108,7 +108,9 @@ h3{
   padding:0.5rem;
   height: 2.5rem;
 }
-
+option{
+  font-family: 'Noto Sans';
+}
 .editor-sidebar button {
   font-family: 'Quicksand';
   padding: 0.5rem;
