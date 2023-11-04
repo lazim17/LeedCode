@@ -1,7 +1,4 @@
 /* CodeEditor.css */
-
-@import url('https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Noto+Sans:wght@300&family=Quicksand&display=swap');
-
 body{
   background-color: #E1F3FD;
   color: black;
@@ -102,7 +99,7 @@ h3{
 }
 
 .editor-sidebar select {
-  font-family: 'Quicksand';
+  font-family: 'Quicksand', 'Arial';
   background-color: #E1F3FD;
   color: black;
   border: none;
@@ -111,7 +108,7 @@ h3{
   padding:0.5rem;
   height: 2.5rem;
 }
-option{
+.editor-sidebar {
   font-family: 'Noto Sans';
 }
 .editor-sidebar button {

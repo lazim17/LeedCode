@@ -32,3 +32,26 @@
     border-radius: 100vw;
     padding:0.7rem;
 }
+
+.container-login{
+    width: 100vw;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-card h3{
+    margin:  0 0 2vh 0;    
+}
+.login-card{
+    height: 30vh;
+    width: 40vw;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container-login form{
+    display: flex;
+    flex-direction: column;
+}
