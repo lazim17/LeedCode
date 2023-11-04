@@ -39,7 +39,7 @@ h3{
   width: 43vw;
   margin: 0 1rem 0 0;
   height: 80vh;
-  padding: 0 1vw 0 0;
+  padding: 0 0 0 0;
   overflow-y: scroll;
   border: 1px solid #ccc;
   border-radius: 25px;
@@ -78,6 +78,9 @@ h3{
 }
 .question{
   padding-left: 6.5vw;
+}
+.question p{
+  width:34vw;
 }
 
 

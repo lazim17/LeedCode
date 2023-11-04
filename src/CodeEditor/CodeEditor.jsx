@@ -135,6 +135,12 @@ const CodeEditor = () => {
             sums of its diagonals. For example, the square matrix is shown
             below:
           </p>
+          <h4>Constraints</h4>
+          <p>
+            Given a square matrix, calculate the absolute difference between the
+            sums of its diagonals. For example, the square matrix is shown
+            below:
+          </p>
           </div>
         </div>
         <div>
