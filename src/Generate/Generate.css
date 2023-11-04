@@ -1,0 +1,12 @@
+.generator-container{
+    display: flex;
+    width: 100vw;
+    height: 80vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.generator-canvas form{
+    display: flex;
+    flex-direction: column;
+}
