@@ -15,7 +15,7 @@ export default function LoginSelect() {
         </div>
         <div className="option-container">
           <div className="option-details">
-            <h4>Employee</h4>
+            <h4>Employer</h4>
             <Link to="/login/employer">Login as Employer</Link>
           </div>
         </div>
