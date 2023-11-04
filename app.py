@@ -2,19 +2,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import subprocess
 import openai
+import os
 import re
 from datetime import datetime
 
 
 app = Flask(__name__)
 CORS(app)
-
+apikey = "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"
 
 @app.route('/generateq',methods = ['POST'])
 def generateq():
     data = request.get_json()
     description = data.get('body', '')
-    openai.api_key = "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"
+    openai.api_key = apikey
+
     system_msg = (
         "You are a machine who generates 15 coding questions whose answers are functions with string and integer manipulation"
         )
