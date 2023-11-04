@@ -1,10 +1,49 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import subprocess
+import openai
+import re
 from datetime import datetime
+
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route('/generateq',methods = ['POST'])
+def generateq():
+    data = request.get_json()
+    description = data.get('body', '')
+    openai.api_key = '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'
+    system_msg = (
+        "You are a machine who generates medium difficulty coding questions whose answers are functions like string manipulation and similar ones"
+        )
+    
+    user_msg = "Generate 10 difficult coding questions like those in leetcode and hackerrank(only questions and dont tell which language) which should help determine the suitability of an applicant for a job with the description : " + description + ". no need of examples,generate only questions"
+
+    response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": user_msg}
+            ],
+            temperature=0.5
+        )
+
+    questionlist = response['choices'][0]['message']['content']
+
+    lines = questionlist.split('\n')
+    questions = []
+
+    for line in lines:
+        question = re.sub(r'^\d+\.\s*', '', line).strip()
+        if question:
+            questions.append(question)
+    
+    return jsonify({'questions': questions})
+    
+
+
 
 @app.route('/run', methods=['POST'])
 def run_code():

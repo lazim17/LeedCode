@@ -21,6 +21,9 @@ const Navbar = () => {
             <li>
               <Link to="/question">Code Editor (Only for now)</Link>
             </li>
+            <li>
+              <Link to="/generate">Generate Questions</Link>
+            </li>
             <li className="login">
               <Link to="/login">
                 Login

@@ -11,7 +11,6 @@ const CodeEditor = () => {
   const [error, setError] = useState("");
   const [compilationMessage, setCompilationMessage] = useState("");
 
-  const baseURL = "http://localhost:5000";
 
   monaco.editor.defineTheme('myTheme', {
     base: 'vs', // Use the 'vs' as the base theme
@@ -29,7 +28,7 @@ const CodeEditor = () => {
   const compileCode = async () => {
     if (selectedLanguage) {
       try {
-        const response = await axios.post(`${baseURL}/compile`, {
+        const response = await axios.post(`/compile`, {
           code,
           language: selectedLanguage,
         });
@@ -54,7 +53,7 @@ const CodeEditor = () => {
   const runCode = async () => {
     if (selectedLanguage) {
       try {
-        const response = await axios.post(`${baseURL}/run`, {
+        const response = await axios.post(`/run`, {
           code,
           language: selectedLanguage,
         });
