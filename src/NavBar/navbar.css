@@ -1,0 +1,35 @@
+nav ul li{
+    list-style-type: none;
+}
+
+.navbar{
+    width: 97vw;
+}
+.navbar ul{
+    width: 95vw;
+    display: flex;
+    padding: 0%;
+    align-items: center;
+}
+.navbar ul li{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 0 1rem 0 0;
+}
+
+.navbar .login{
+    background-color: azure;
+    margin-left: auto;
+    padding: 0%;
+    width: 5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    height: 2rem;
+}
+.login a{
+    text-decoration: none;
+    color: black;
+}
