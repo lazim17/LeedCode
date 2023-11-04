@@ -1,4 +1,4 @@
 # LeedCode
 
 ## About
-Code Editor Application made with React and Flask
+An Online Proctoring Platform made with ReactJs and Flask

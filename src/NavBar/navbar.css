@@ -4,6 +4,8 @@ nav ul li{
 
 .navbar{
     width: 97vw;
+    position: fixed;
+    top: 0%;
 }
 .navbar ul{
     width: 95vw;
