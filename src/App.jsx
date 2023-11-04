@@ -6,7 +6,7 @@ import StudentLogin from "./LoginForms/StudentLogin";
 import EmployerLogin from "./LoginForms/EmployerLogin";
 import LoginSelect from "./LoginForms/LoginSelect";
 import HomePage from "./Homepage/HomePage";
-import Generate from "./generate";
+import Generate from "./Generate/Generate";
 
 export default function App() {
   return (
@@ -16,9 +16,9 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/question" element={<CodeEditor />} />
         <Route path="/generate" element={<Generate />} />
+        <Route path="/login" element={<LoginSelect />} />
         <Route path="/login/student" element={<StudentLogin />} />
         <Route path="/login/employer" element={<EmployerLogin />} />
-        <Route path="/login" element={<LoginSelect />} />
       </Routes>
     </div>
   );
