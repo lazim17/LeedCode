@@ -14,7 +14,7 @@ CORS(app)
 def generateq():
     data = request.get_json()
     description = data.get('body', '')
-    openai.api_key = "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"
+    openai.api_key = "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"
     system_msg = (
         "You are a machine who generates 15 coding questions whose answers are functions with string and integer manipulation"
         )
@@ -27,7 +27,7 @@ def generateq():
                 {"role": "system", "content": system_msg},
                 {"role": "user", "content": user_msg}
             ],
-            temperature=0
+            temperature=1
         )
 
     questionlist = response['choices'][0]['message']['content']
