@@ -1,13 +1,34 @@
+.login-select{
+    width: 100vw;
+}
+.login-select h3{
+    height: 20vh;
+    margin: 0%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .select-container{
     display: flex;
     width:100vw;
-    height: 50vh;
+    height: 60vh;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 .option-container{
     text-align: center;
-    width: 50vw;
+    width: 30vw;
+    height: 40vh;
     display: flex;
     justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 35px;
+}
+.option-container a{
+    text-decoration: none;
+    background-color: #2A2D1E;
+    color: #90AC95;
+    border-radius: 100vw;
+    padding:0.7rem;
 }

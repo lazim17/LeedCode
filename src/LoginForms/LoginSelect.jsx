@@ -4,7 +4,7 @@ import "./Login.css";
 
 export default function LoginSelect() {
   return (
-    <div>
+    <div className="login-select body">
       <h3>Select Login as</h3>
       <div className="select-container">
         <div className="option-container">
