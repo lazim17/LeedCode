@@ -14,12 +14,12 @@ CORS(app)
 def generateq():
     data = request.get_json()
     description = data.get('body', '')
-    openai.api_key = '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'
+    openai.api_key = "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"
     system_msg = (
-        "You are a machine who generates medium difficulty coding questions whose answers are functions like string manipulation and similar ones"
+        "You are a machine who generates 15 coding questions whose answers are functions with string and integer manipulation"
         )
     
-    user_msg = "Generate 10 difficult coding questions like those in leetcode and hackerrank(only questions and dont tell which language) which should help determine the suitability of an applicant for a job with the description : " + description + ". no need of examples,generate only questions"
+    user_msg = "Generate 15 moderate to very hard coding questions that makes functions and can be written in all the major languages (only questions and dont tell which language) which should help determine the suitability of an applicant for a job with the description : " + description + ". no need of examples,generate only questions"
 
     response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -27,7 +27,7 @@ def generateq():
                 {"role": "system", "content": system_msg},
                 {"role": "user", "content": user_msg}
             ],
-            temperature=0.5
+            temperature=0
         )
 
     questionlist = response['choices'][0]['message']['content']
