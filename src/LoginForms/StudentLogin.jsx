@@ -1,23 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios"; // Import Axios
 
 export default function StudentLogin() {
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
+  //ref for Username and Password
+  const userRef = useRef();
+  const pwRef = useRef();
+
+  //Username, Password and Error Message State
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+
+  //Default Focus on User Input useEffect
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
+  //Error Message Reset useEffect
+  useEffect(() => {
+    setError("");
+  }, [loginData.username, loginData.password]);
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('/login', loginData); // Use the proxy setting
+      const response = await axios.post("/login", loginData); // Use the proxy setting
 
       if (response.status === 200) {
         const data = response.data;
         console.log(data);
-      } else {
-        console.error(`Error: ${response.status}`);
       }
     } catch (error) {
-      console.error(error);
+      setError(error.response.data.message);
     }
-  }
+  };
 
   return (
     <div className="container-login body">
@@ -27,16 +40,24 @@ export default function StudentLogin() {
           <input
             type="text"
             value={loginData.username}
-            onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
+            onChange={(e) =>
+              setLoginData({ ...loginData, username: e.target.value })
+            }
             placeholder="Username"
+            required
+            ref={userRef}
           />
           <input
-            type="text"
+            type="password"
             value={loginData.password}
-            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+            onChange={(e) =>
+              setLoginData({ ...loginData, password: e.target.value })
+            }
             placeholder="Password"
+            ref={pwRef}
           />
           <input type="button" onClick={handleLogin} value={"Submit"} />
+          <p>{error}</p>
         </form>
       </div>
     </div>
