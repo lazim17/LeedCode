@@ -19,9 +19,11 @@ h2{
   margin: 0;
   font-family: 'Cutive Mono';
   font-size: 2rem;
+  font-weight: 300;
 }
 h3{
   font-family: 'Quicksand';
+  font-weight: 700;
 }
 
 .canvas{

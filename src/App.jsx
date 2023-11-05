@@ -2,6 +2,7 @@ import React from "react";
 import CodeEditor from "./CodeEditor/CodeEditor";
 import Navbar from "./NavBar/navbar";
 import { Route, Routes } from "react-router-dom";
+import { Outlet } from "react-router";
 import StudentLogin from "./LoginForms/StudentLogin";
 import StudentDashboard from "./LoginForms/StudentDashboard";
 import EmployerLogin from "./LoginForms/EmployerLogin";
@@ -9,19 +10,31 @@ import LoginSelect from "./LoginForms/LoginSelect";
 import HomePage from "./Homepage/HomePage";
 import Generate from "./Generate/Generate";
 
+//Authentication Context
+import { AuthProvider } from "./context/AuthProvider";
+
 export default function App() {
   return (
-    <div>
-      <Navbar />
+    <AuthProvider>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          element={
+            <>
+              <Navbar />
+              <Outlet />
+            </>
+          }
+        >
+          <Route path="/" element={<HomePage />} />
+          <Route path="/generate" element={<Generate />} />
+          <Route path="/login" element={<LoginSelect />} />
+        </Route>
+        
         <Route path="/question" element={<CodeEditor />} />
-        <Route path="/generate" element={<Generate />} />
-        <Route path="/login" element={<LoginSelect />} />
         <Route path="/login/student" element={<StudentLogin />} />
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/login/employer" element={<EmployerLogin />} />
       </Routes>
-    </div>
+    </AuthProvider>
   );
 }

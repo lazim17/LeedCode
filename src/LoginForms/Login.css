@@ -35,23 +35,42 @@
 
 .container-login{
     width: 100vw;
-    height: 80vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.login-card h3{
-    margin:  0 0 2vh 0;    
+.login-card h3,.login-card h2{
+    margin:  0 0 2vh 0;
+    text-align: center;    
 }
 .login-card{
-    height: 30vh;
-    width: 40vw;
-    border: 1px solid black;
+    height: 60vh;
+    width: 45vw;
+    background-color: #B9C2C6;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 20px;
 }
 .container-login form{
     display: flex;
     flex-direction: column;
+    width: 35vw;
+    height: 50vh;
+}
+.container-login form input{
+    background-color: #E1F3FD;
+    font-family: 'Noto Sans';
+    border: none;
+    border-radius: 10px;
+    height: 2.5rem;
+    padding: 0 1rem;
+    margin: 1rem 0;
+}
+.container-login .submit-button{
+    background-color: #90AC95;
+    color: #E1F3FD;
+    width: 10vw;
+    align-self: flex-end;
 }
