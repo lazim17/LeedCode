@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios"; // Import Axios
+import AuthContext from "../context/AuthProvider";
 
 export default function StudentLogin() {
   //ref for Username and Password
   const userRef = useRef();
   const pwRef = useRef();
+  const { setAuth } = useContext(AuthContext);
 
   //Username, Password and Error Message State
   const [loginData, setLoginData] = useState({ username: "", password: "" });
@@ -25,7 +27,9 @@ export default function StudentLogin() {
 
       if (response.status === 200) {
         const data = response.data;
-        console.log(data);
+
+        //Setting Context for Authentication
+        setAuth({ success: true, loginData, data });
       }
     } catch (error) {
       setError(error.response.data.message);
@@ -33,30 +37,31 @@ export default function StudentLogin() {
   };
 
   return (
-    <div className="container-login body">
+    <div className="container-login">
       <div className="login-card">
         <form>
-          <h3>Login as Student</h3>
+          <h2>LeedCode</h2>
+          <h3>Sign In</h3>
+          <label htmlFor="username">Username</label>
           <input
             type="text"
             value={loginData.username}
             onChange={(e) =>
               setLoginData({ ...loginData, username: e.target.value })
             }
-            placeholder="Username"
             required
             ref={userRef}
           />
+          <label htmlFor="Password">Password</label>
           <input
             type="password"
             value={loginData.password}
             onChange={(e) =>
               setLoginData({ ...loginData, password: e.target.value })
             }
-            placeholder="Password"
             ref={pwRef}
           />
-          <input type="button" onClick={handleLogin} value={"Submit"} />
+          <input type="button" className="submit-button" onClick={handleLogin} value={"Next"} />
           <p>{error}</p>
         </form>
       </div>
