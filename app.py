@@ -4,18 +4,67 @@ import subprocess
 import openai
 import os
 import re
+from bson import ObjectId
 from datetime import datetime
-
+from pymongo import MongoClient
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
+
+# Establish a MongoDB connection and get the "LeedCode" database
+client = MongoClient('mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority')
+db = client.get_database('LeedCode')
+
 CORS(app)
-apikey = "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"
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+class User(UserMixin):
+    def __init__(self, user_data):
+        self.user_data = user_data
+
+    def get_id(self):
+        # Implement the method to return the user's unique identifier (e.g., user ID)
+        return str(self.user_data.get('_id'))
+
+login_manager.user_loader
+def load_user(user_id):
+    user_data = db.users.find_one({"_id": ObjectId(user_id)})
+    return User(user_data) if user_data else None
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            return jsonify({"message": "Username and password are required"}), 400
+
+        user = db.users.find_one({"username": username})
+
+        if user and user.get('password') == password:  # Use get() method to safely access the password
+            user_obj = User(user)
+            login_user(user_obj)
+            return jsonify({"message": "Login successful"})
+        else:
+            return jsonify({"message": "Invalid credentials"}), 401
+
+    
+
+        
+
+
 
 @app.route('/generateq',methods = ['POST'])
 def generateq():
     data = request.get_json()
     description = data.get('body', '')
-    openai.api_key = apikey
+    openai.api_key = "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"
 
     system_msg = (
         "You are a machine who generates 15 coding questions whose answers are functions with string and integer manipulation"
