@@ -30,6 +30,9 @@ export default function StudentLogin() {
 
         //Setting Context for Authentication
         setAuth({ success: true, loginData, data });
+        
+        sessionStorage.setItem("Status", true)
+        sessionStorage.setItem("Username", loginData.username)
       }
     } catch (error) {
       setError(error.response.data.message);
