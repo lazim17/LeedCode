@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios"; // Import Axios
-import AuthContext from "../context/AuthProvider";
+import TokenContext from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function StudentLogin() {
   //ref for Username and Password
   const userRef = useRef();
   const pwRef = useRef();
-  const { auth, setAuth } = useContext(AuthContext);
+  const { token, setToken } = useContext(TokenContext);
   const navigate = useNavigate();
 
   //Username, Password and Error Message State
@@ -17,7 +17,7 @@ export default function StudentLogin() {
   //Default Focus on User Input useEffect
   useEffect(() => {
     userRef.current.focus();
-    if (auth) {
+    if (token) {
       navigate("/");
     }
   }, []);
@@ -32,12 +32,12 @@ export default function StudentLogin() {
       const response = await axios.post("/login", loginData); // Use the proxy setting
 
       if (response.status === 200) {
-        const data = response.data;
+        const {token} = response.data;
 
         //Setting Context for Authentication
-        setAuth(true);
-
-        localStorage.setItem("Status", true);
+        setToken(token);
+        localStorage.setItem("token",token);
+        localStorage.setItem("status","logged in")
         localStorage.setItem("Username", loginData.username);
         navigate("/");
       }

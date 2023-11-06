@@ -1,18 +1,31 @@
 // Navbar.js
 import React, { useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "./navbar.css";
-import AuthContext, { AuthProvider } from "../context/AuthProvider";
+import TokenContext, { TokenProvider } from "../context/AuthProvider";
 
 const Navbar = () => {
   const location = useLocation();
-  const { auth } = useContext(AuthContext);
+  const { token,setToken } = useContext(TokenContext);
+  const navigate = useNavigate();
+
 
   // Conditionally render the navbar except on the /question route
   const renderNavbar = location.pathname !== "/question";
 
+  const handleLogout = async() => {
+    if(token){
+      setToken(null)
+      localStorage.removeItem("token")
+      localStorage.setItem("status","logged out")
+      localStorage.removeItem("Username")
+      navigate("/")
+    }
+
+  }
+
   function Button() {
-    if (auth) {
+    if (token) {
       <Link to="/student">Dashboard</Link>;
     } else {
       <Link to="/login">Login</Link>;
@@ -35,12 +48,19 @@ const Navbar = () => {
               <Link to="/generate">Generate Questions</Link>
             </li>
             <li className="login">
-              {auth &&
+              {token ? (  
+                <Link to="/student">{localStorage.getItem("Username")}</Link>
+              ) : (
+                <Link to="/login">Login</Link>  
+              )}
+            </li>
+            {token &&
               (
-                <Link to='/student'>{localStorage.getItem("Username")}</Link>
+              <li className="login">
+                <input type="button" onClick={handleLogout} value="logout" name="logout"></input>
+              </li>
               )
               }
-            </li>
           </ul>
         </nav>
       )}

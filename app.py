@@ -7,33 +7,19 @@ import re
 from bson import ObjectId
 from datetime import datetime
 from pymongo import MongoClient
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_jwt_extended import JWTManager,create_access_token
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400
+
 
 # Establish a MongoDB connection and get the "LeedCode" database
 client = MongoClient('mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority')
 db = client.get_database('LeedCode')
-
+jwt = JWTManager(app)
 CORS(app)
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
-
-class User(UserMixin):
-    def __init__(self, user_data):
-        self.user_data = user_data
-
-    def get_id(self):
-        # Implement the method to return the user's unique identifier (e.g., user ID)
-        return str(self.user_data.get('_id'))
-
-login_manager.user_loader
-def load_user(user_id):
-    user_data = db.users.find_one({"_id": ObjectId(user_id)})
-    return User(user_data) if user_data else None
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -48,9 +34,8 @@ def login():
         user = db.users.find_one({"username": username})
 
         if user and user.get('password') == password:  # Use get() method to safely access the password
-            user_obj = User(user)
-            login_user(user_obj)
-            return jsonify({"message": "Login successful"})
+            token = create_access_token(identity=str(user['_id']))
+            return jsonify({"token": token}),200
         else:
             return jsonify({"message": "Invalid credentials"}), 401
 

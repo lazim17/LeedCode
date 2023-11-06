@@ -11,11 +11,11 @@ import HomePage from "./Homepage/HomePage";
 import Generate from "./Generate/Generate";
 
 //Authentication Context
-import { AuthProvider } from "./context/AuthProvider";
+import { TokenProvider } from "./context/AuthProvider";
 
 export default function App() {
   return (
-    <AuthProvider>
+    <TokenProvider>
       <Routes>
         <Route
           element={
@@ -35,6 +35,6 @@ export default function App() {
         <Route path="/login/student" element={<StudentLogin />} />
         <Route path="/login/employer" element={<EmployerLogin />} />
       </Routes>
-    </AuthProvider>
+    </TokenProvider>
   );
 }
