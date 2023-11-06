@@ -1,13 +1,21 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function StudentDashboard() {
   const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  console.log(auth)
+  var username = localStorage.getItem("Username")
+
+  useEffect(()=>{
+    if(!auth){
+      navigate('/login')
+    }
+  })
   return (
     <div className="body">
-      <h3>Welcome Arjun</h3>
+      <h3>Welcome {username} </h3>
     </div>
   );
 }

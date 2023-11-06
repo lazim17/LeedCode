@@ -6,6 +6,10 @@ nav ul li{
     width: 97vw;
     position: fixed;
     top: 0%;
+    background: none;
+    backdrop-filter: blur( 8.5px );
+    -webkit-backdrop-filter: blur( 8.5px );
+    border-radius: 10px;
 }
 .navbar ul{
     width: 95vw;

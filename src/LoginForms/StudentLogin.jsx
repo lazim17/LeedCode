@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios"; // Import Axios
 import AuthContext from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function StudentLogin() {
   //ref for Username and Password
   const userRef = useRef();
   const pwRef = useRef();
-  const { setAuth } = useContext(AuthContext);
+  const { auth, setAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   //Username, Password and Error Message State
   const [loginData, setLoginData] = useState({ username: "", password: "" });
@@ -15,7 +17,11 @@ export default function StudentLogin() {
   //Default Focus on User Input useEffect
   useEffect(() => {
     userRef.current.focus();
+    if (auth) {
+      navigate("/");
+    }
   }, []);
+  
   //Error Message Reset useEffect
   useEffect(() => {
     setError("");
@@ -29,13 +35,16 @@ export default function StudentLogin() {
         const data = response.data;
 
         //Setting Context for Authentication
-        setAuth({ success: true, loginData, data });
+        setAuth(true);
+
+        localStorage.setItem("Status", true);
+        localStorage.setItem("Username", loginData.username);
+        navigate("/");
       }
     } catch (error) {
       setError(error.response.data.message);
     }
   };
-
   return (
     <div className="container-login">
       <div className="login-card">
@@ -61,7 +70,12 @@ export default function StudentLogin() {
             }
             ref={pwRef}
           />
-          <input type="button" className="submit-button" onClick={handleLogin} value={"Next"} />
+          <input
+            type="button"
+            className="submit-button"
+            onClick={handleLogin}
+            value={"Next"}
+          />
           <p>{error}</p>
         </form>
       </div>
