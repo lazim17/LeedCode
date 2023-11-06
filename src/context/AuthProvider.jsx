@@ -1,13 +1,11 @@
 import { createContext, useEffect, useState } from "react";
-
 //Creating AuthContext
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   //UseState for Auth Values
   const [auth, setAuth] = useState({});
-  console.log(auth);
-
+  console.log(auth)
   useEffect(() => {
     if (auth.loginData !== undefined) {
       sessionStorage.setItem("Username", auth.loginData.username);
