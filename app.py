@@ -49,7 +49,7 @@ def login():
 def generateq():
     data = request.get_json()
     description = data.get('body', '')
-    openai.api_key = "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"
+    openai.api_key = "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"
 
     system_msg = (
         "You are a machine who generates 15 coding questions whose answers are functions with string and integer manipulation"

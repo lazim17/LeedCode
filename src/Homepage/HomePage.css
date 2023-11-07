@@ -2,4 +2,11 @@
     width:90vw;
     padding: 0 5vw;
     height: 200vh;
+
+}
+
+.first{
+    font-size:10vh ;
+    margin-top: 1rem;
+    font-weight: bolder;
 }
