@@ -7,7 +7,7 @@ export default function StudentLogin() {
   //ref for Username and Password
   const userRef = useRef();
   const pwRef = useRef();
-  const { token, setToken } = useContext(TokenContext);
+  const { token, role, setToken, setRole } = useContext(TokenContext);
   const navigate = useNavigate();
 
   //Username, Password and Error Message State
@@ -32,14 +32,20 @@ export default function StudentLogin() {
       const response = await axios.post("/login", loginData); // Use the proxy setting
 
       if (response.status === 200) {
-        const {token} = response.data;
+        const {token, role} = response.data;
 
         //Setting Context for Authentication
         setToken(token);
+        setRole(role);
+        console.log(role);
         localStorage.setItem("token",token);
         localStorage.setItem("status","logged in")
         localStorage.setItem("Username", loginData.username);
-        navigate("/");
+        if(role == "student"){
+          navigate("/student");
+        }else if(role == "admin"){
+          navigate("/employer")
+        }
       }
     } catch (error) {
       setError(error.response.data.message);

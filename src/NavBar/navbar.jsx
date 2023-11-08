@@ -6,7 +6,7 @@ import TokenContext, { TokenProvider } from "../context/AuthProvider";
 
 const Navbar = () => {
   const location = useLocation();
-  const { token,setToken } = useContext(TokenContext);
+  const { token, role, setToken, setRole } = useContext(TokenContext);
   const navigate = useNavigate();
 
 
@@ -41,18 +41,24 @@ const Navbar = () => {
               <h2>LeedCode</h2>&nbsp;
               <p>( Pun Intended )</p>
             </li>
+            {role === "student" && token &&(
             <li>
-              <Link to="/question">Code Editor (Only for now)</Link>
+              <Link to="/question">Code Editor (Only for now)</Link>  
             </li>
-            <li>
-              <Link to="/generate">Generate Questions</Link>
+            )}
+            {role === "admin" && token && (
+            <li>  
+              <Link to="/generate">Generate Questions</Link>  
             </li>
+            )}
             <li className="login">
-              {token ? (  
-                <Link to="/student">{localStorage.getItem("Username")}</Link>
-              ) : (
-                <Link to="/login">Login</Link>  
-              )}
+            {token && (role === "student" ? (
+  <Link to="/student">{localStorage.getItem("Username")}</Link>
+) : role === "admin" && (
+  <Link to="/employer">{localStorage.getItem("Username")}</Link>
+))}
+
+{!token && <Link to="/login">Login</Link>}
             </li>
             {token &&
               (

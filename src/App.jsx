@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import { Outlet } from "react-router";
 import StudentLogin from "./LoginForms/StudentLogin";
 import StudentDashboard from "./LoginForms/StudentDashboard";
-import EmployerLogin from "./LoginForms/EmployerLogin";
+import EmployerDashboard from "./LoginForms/EmployerDashboard";
 import LoginSelect from "./LoginForms/LoginSelect";
 import HomePage from "./Homepage/HomePage";
 import Generate from "./Generate/Generate";
@@ -29,11 +29,13 @@ export default function App() {
           <Route path="/generate" element={<Generate />} />
           <Route path="/login" element={<LoginSelect />} />
           <Route path="/student" element={<StudentDashboard />} />
+          <Route path="/employer" element={<EmployerDashboard />} />
+
         </Route>
         
         <Route path="/question" element={<CodeEditor />} />
         <Route path="/login/student" element={<StudentLogin />} />
-        <Route path="/login/employer" element={<EmployerLogin />} />
+
       </Routes>
     </TokenProvider>
   );

@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import TokenContext from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
-export default function StudentDashboard() {
+export default function EmployerDashboard() {
   const { token } = useContext(TokenContext);
   const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ export default function StudentDashboard() {
   })
   return (
     <div className="body">
-      <h1>student</h1>
+        <h1>admin</h1>
       <h3>Welcome {username} </h3>
     </div>
   );

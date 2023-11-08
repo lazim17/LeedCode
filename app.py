@@ -4,7 +4,8 @@ import subprocess
 import openai
 import os
 import re
-from bson import ObjectId
+from decouple import config
+
 from datetime import datetime
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token
@@ -12,6 +13,7 @@ from flask_jwt_extended import JWTManager,create_access_token
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400
+openaikey = config('OPENAI_API_KEY')
 
 
 # Establish a MongoDB connection and get the "LeedCode" database
@@ -19,6 +21,7 @@ client = MongoClient('mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?re
 db = client.get_database('LeedCode')
 jwt = JWTManager(app)
 CORS(app)
+
 
 
 @app.route('/login', methods=['POST'])
@@ -35,7 +38,8 @@ def login():
 
         if user and user.get('password') == password:  # Use get() method to safely access the password
             token = create_access_token(identity=str(user['_id']))
-            return jsonify({"token": token}),200
+            role = user.get('role')
+            return jsonify({"token": token, "role":role}),200
         else:
             return jsonify({"message": "Invalid credentials"}), 401
 
@@ -49,7 +53,7 @@ def login():
 def generateq():
     data = request.get_json()
     description = data.get('body', '')
-    openai.api_key = "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"
+    openai.api_key = openaikey
 
     system_msg = (
         "You are a machine who generates 15 coding questions whose answers are functions with string and integer manipulation"
