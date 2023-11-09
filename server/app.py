@@ -5,7 +5,6 @@ import openai
 import os
 import re
 from decouple import config
-
 from datetime import datetime
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token
