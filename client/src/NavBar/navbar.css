@@ -37,17 +37,34 @@ nav ul li{
     justify-content: start;
     padding: 0 1rem 0 0;
 }
-
+.generate{
+    margin-left: auto;
+}
+.editor{
+    margin-left: auto;
+}
 .navbar .login{
     background-color: azure;
     margin-left: auto;
-    padding: 0%;
-    width: 5vw;
+    padding: 0% 1vw;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 20px;
-    height: 2rem;
+    border-radius: 25%/50%;
+    height: 4vh;
+}
+.logout{
+    background-color: #485249;
+    color: #d9d9d9;
+    border: none;
+    width: 5vw;
+    height: 4vh;
+    border-radius: 50px;
+    font-size: 1rem;
+    margin: 0 0 0 0.5rem;
+}
+.logout:hover{
+    cursor: pointer;
 }
 .login a{
     text-decoration: none;

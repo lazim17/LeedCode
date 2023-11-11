@@ -37,42 +37,44 @@ const Navbar = () => {
         <nav className="navbar">
           <ul>
             <li>
-              <h1 className="logo"><Link to={'/'}>LEEDCODE</Link></h1>
+              <h1 className="logo">
+                <Link to={"/"}>LEEDCODE</Link>
+              </h1>
             </li>
             {role === "student" && token && (
-              <li>
+              <li className="editor">
                 <Link to="/question">Code Editor (Beta)</Link>
               </li>
             )}
             {role === "admin" && token && (
-              <li>
+              <li className="generate">
                 <Link to="/generate">Generate Questions (Beta)</Link>
               </li>
             )}
             <li className="login">
               {token &&
                 (role === "student" ? (
-                  <Link to="/student">{localStorage.getItem("Username")}</Link>
+                  <Link to="/student">{localStorage.getItem("Username")[0].toUpperCase()}</Link>
                 ) : (
                   role === "admin" && (
                     <Link to="/employer">
-                      {localStorage.getItem("Username")}
+                      {localStorage.getItem("Username")[0].toUpperCase()}
                     </Link>
                   )
                 ))}
-
               {!token && <Link to="/login">Login</Link>}
             </li>
+            <li>
             {token && (
-              <li className="login">
-                <input
-                  type="button"
-                  onClick={handleLogout}
-                  value="logout"
-                  name="logout"
-                ></input>
-              </li>
-            )}
+                  <input
+                    type="button"
+                    onClick={handleLogout}
+                    className="logout"
+                    value="Logout"
+                    name="logout"
+                  ></input>
+              )}
+            </li>
           </ul>
         </nav>
       )}
