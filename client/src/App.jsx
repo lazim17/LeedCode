@@ -26,12 +26,11 @@ export default function App() {
         >
           <Route path="/" element={<HomePage />} />
           <Route path="/generate" element={<Generate />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/employer" element={<EmployerDashboard />} />
 
         </Route>
-        
+        <Route path="/login" element={<Login />} />
         <Route path="/question" element={<CodeEditor />} />
 
       </Routes>
