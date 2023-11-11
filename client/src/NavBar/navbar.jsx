@@ -9,20 +9,18 @@ const Navbar = () => {
   const { token, role, setToken, setRole } = useContext(TokenContext);
   const navigate = useNavigate();
 
-
   // Conditionally render the navbar except on the /question route
   const renderNavbar = location.pathname !== "/question";
 
-  const handleLogout = async() => {
-    if(token){
-      setToken(null)
-      localStorage.removeItem("token")
-      localStorage.setItem("status","logged out")
-      localStorage.removeItem("Username")
-      navigate("/")
+  const handleLogout = async () => {
+    if (token) {
+      setToken(null);
+      localStorage.removeItem("token");
+      localStorage.setItem("status", "logged out");
+      localStorage.removeItem("Username");
+      navigate("/");
     }
-
-  }
+  };
 
   function Button() {
     if (token) {
@@ -38,35 +36,42 @@ const Navbar = () => {
         <nav className="navbar">
           <ul>
             <li>
-              <h2>LeedCode</h2>&nbsp;
-              <p>( Pun Intended )</p>
+              <h1 className="logo">LEEDCODE</h1>
             </li>
-            {role === "student" && token &&(
-            <li>
-              <Link to="/question">Code Editor (Only for now)</Link>  
-            </li>
+            {role === "student" && token && (
+              <li>
+                <Link to="/question">Code Editor (Only for now)</Link>
+              </li>
             )}
             {role === "admin" && token && (
-            <li>  
-              <Link to="/generate">Generate Questions</Link>  
-            </li>
+              <li>
+                <Link to="/generate">Generate Questions</Link>
+              </li>
             )}
             <li className="login">
-            {token && (role === "student" ? (
-  <Link to="/student">{localStorage.getItem("Username")}</Link>
-) : role === "admin" && (
-  <Link to="/employer">{localStorage.getItem("Username")}</Link>
-))}
+              {token &&
+                (role === "student" ? (
+                  <Link to="/student">{localStorage.getItem("Username")}</Link>
+                ) : (
+                  role === "admin" && (
+                    <Link to="/employer">
+                      {localStorage.getItem("Username")}
+                    </Link>
+                  )
+                ))}
 
-{!token && <Link to="/login">Login</Link>}
+              {!token && <Link to="/login">Login</Link>}
             </li>
-            {token &&
-              (
+            {token && (
               <li className="login">
-                <input type="button" onClick={handleLogout} value="logout" name="logout"></input>
+                <input
+                  type="button"
+                  onClick={handleLogout}
+                  value="logout"
+                  name="logout"
+                ></input>
               </li>
-              )
-              }
+            )}
           </ul>
         </nav>
       )}

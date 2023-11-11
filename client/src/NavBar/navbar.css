@@ -1,16 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Expletus+Sans&display=swap');
+
 nav ul li{
     list-style-type: none;
 }
 
 
 .navbar{
-    width: 97vw;
+    width: 98vw;
+    height: 10vh;
+    padding: 2.5vh;
     position: fixed;
     top: 0%;
     background: none;
-    backdrop-filter: blur( 8.5px );
+    backdrop-filter: blur( 5px );
     -webkit-backdrop-filter: blur( 8.5px );
     border-radius: 10px;
+}
+.logo{
+    font-family: 'Expletus Sans';
+    color: #485249;
+    font-size: 2rem;
+    width: 5vw;
 }
 .navbar ul{
     width: 95vw;
