@@ -3,7 +3,7 @@ import CodeEditor from "./CodeEditor/CodeEditor";
 import Navbar from "./NavBar/navbar";
 import { Route, Routes } from "react-router-dom";
 import { Outlet } from "react-router";
-import StudentLogin from "./LoginForms/StudentLogin";
+import Login from "./LoginForms/Login";
 import StudentDashboard from "./LoginForms/StudentDashboard";
 import EmployerDashboard from "./LoginForms/EmployerDashboard";
 import HomePage from "./Homepage/HomePage";
@@ -26,7 +26,7 @@ export default function App() {
         >
           <Route path="/" element={<HomePage />} />
           <Route path="/generate" element={<Generate />} />
-          <Route path="/login" element={<StudentLogin />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/employer" element={<EmployerDashboard />} />
 

@@ -18,9 +18,12 @@ nav ul li{
 }
 .logo{
     font-family: 'Expletus Sans';
-    color: #485249;
     font-size: 2rem;
     width: 5vw;
+}
+.logo a{
+    color: #485249;
+    text-decoration: none;
 }
 .navbar ul{
     width: 95vw;

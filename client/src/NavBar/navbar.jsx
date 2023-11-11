@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "./navbar.css";
 import TokenContext, { TokenProvider } from "../context/AuthProvider";
+import HomePage from "../Homepage/HomePage";
 
 const Navbar = () => {
   const location = useLocation();
@@ -36,16 +37,16 @@ const Navbar = () => {
         <nav className="navbar">
           <ul>
             <li>
-              <h1 className="logo">LEEDCODE</h1>
+              <h1 className="logo"><Link to={'/'}>LEEDCODE</Link></h1>
             </li>
             {role === "student" && token && (
               <li>
-                <Link to="/question">Code Editor (Only for now)</Link>
+                <Link to="/question">Code Editor (Beta)</Link>
               </li>
             )}
             {role === "admin" && token && (
               <li>
-                <Link to="/generate">Generate Questions</Link>
+                <Link to="/generate">Generate Questions (Beta)</Link>
               </li>
             )}
             <li className="login">
