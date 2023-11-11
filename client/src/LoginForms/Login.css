@@ -1,38 +1,3 @@
-.login-select{
-    width: 100vw;
-}
-.login-select h3{
-    height: 20vh;
-    margin: 0%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.select-container{
-    display: flex;
-    width:100vw;
-    height: 60vh;
-    align-items: center;
-    justify-content: space-around;
-}
-.option-container{
-    text-align: center;
-    width: 30vw;
-    height: 40vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid black;
-    border-radius: 35px;
-}
-.option-container a{
-    text-decoration: none;
-    background-color: #2A2D1E;
-    color: #90AC95;
-    border-radius: 100vw;
-    padding:0.7rem;
-}
-
 .container-login{
     width: 100vw;
     height: 100vh;
@@ -40,37 +5,65 @@
     align-items: center;
     justify-content: center;
 }
+.text h2{
+    font-size: 3rem;
+}
 .login-card h3,.login-card h2{
-    margin:  0 0 2vh 0;
-    text-align: center;    
+    font-family: 'Noto Sans';  
 }
 .login-card{
-    height: 60vh;
-    width: 45vw;
+    height: 100vh;
+    width: 100vw;
     background-color: #B9C2C6;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 20px;
 }
+.left{
+    height: 100vh;
+    width: 50vw;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.right{
+    height: 100vh;
+    width:50vw;
+    background-color: #d9d9d9;
+}
 .container-login form{
     display: flex;
     flex-direction: column;
     width: 35vw;
-    height: 50vh;
+    height: 60vh;
 }
 .container-login form input{
-    background-color: #E1F3FD;
+    background-color: white;
     font-family: 'Noto Sans';
-    border: none;
+    border: 1px solid #A3A0A0;
     border-radius: 10px;
-    height: 2.5rem;
+    height: 3rem;
     padding: 0 1rem;
     margin: 1rem 0;
+    font-size: 1rem;
 }
 .container-login .submit-button{
-    background-color: #90AC95;
-    color: #E1F3FD;
-    width: 10vw;
-    align-self: flex-end;
+    background-color: #d9d9d9;
+    color: #000;
+    border: none;
+}
+.checkbox{
+    display: flex;
+    align-items: center;
+}
+.checkbox label{
+    margin-left: 0.5rem;
+}
+.checkbox .tick{
+    margin: 0rem;
+}
+.error{
+    height: 3vh;
 }

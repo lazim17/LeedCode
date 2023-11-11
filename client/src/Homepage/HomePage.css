@@ -1,12 +1,33 @@
-.homepage-container{
-    width:90vw;
-    padding: 0 5vw;
-    height: 200vh;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3&display=swap');
 
+.homepage-container{
+    width:100vw;
+    color: #424242;
+    background-color: #D9D9D9;
+    padding-top: 15vh;
 }
 
-.first{
-    font-size:10vh ;
-    margin-top: 1rem;
-    font-weight: bolder;
+.homepage-container h2{
+    font-family: 'Noto Sans';
+    font-size: 4rem;
+    font-weight: 400;
+    line-height: 117.68%;
+    width: 50vw;
+}
+
+.page{
+    height: 100vh;
+    padding: 15vh 5vw;
+}
+.first p{
+    font-family: 'Source Sans 3';
+    width: 30vw;
+    font-size: 1.5rem;
+}
+.second{
+    background-color: #829D86;
+}
+.third{
+    background-color: #232523;
 }
