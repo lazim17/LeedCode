@@ -1,0 +1,27 @@
+version: '2.23.0-desktop.1'
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "80:5000"
+    volumes:
+      - ./server:/usr/app
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - mynetwork
+
+  web:
+    build: ./client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/usr/src/spp
+    depends_on:
+      - server
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
