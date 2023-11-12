@@ -8,6 +8,7 @@ from decouple import config
 from datetime import datetime
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token
+from tasks import generateqinfo,check_status
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
@@ -15,7 +16,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400
 openaikey = config('OPENAI_API_KEY')
 
 
-# Establish a MongoDB connection and get the "LeedCode" database
+
 client = MongoClient('mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority')
 db = client.get_database('LeedCode')
 jwt = JWTManager(app)
@@ -44,7 +45,7 @@ def login():
 
     
 
-        
+
 
 
 
@@ -82,8 +83,29 @@ def generateq():
     return jsonify({'questions': questions})
     
 
+@app.route('/qinfo', methods=['POST'])
+def qinfo():
+    data = request.get_json()
+    questions = data.get('questions', [])
+    task = generateqinfo.delay(questions)
+    
+    return jsonify({'task_id': task.id}), 200
+
+@app.route('/check_status/<task_id>', methods=['GET'])
+def handle_check_status(task_id):
+    result = check_status(task_id)
+    return result
 
 
+
+        
+    
+
+
+
+
+
+#CODE-EDITOR
 @app.route('/run', methods=['POST'])
 def run_code():
     data = request.get_json()
