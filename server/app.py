@@ -8,7 +8,7 @@ from decouple import config
 from datetime import datetime
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token
-from tasks import generateqinfo,check_status
+from tasks import generateqinfo,check_status,celery
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
@@ -87,8 +87,10 @@ def generateq():
 def qinfo():
     data = request.get_json()
     questions = data.get('questions', [])
-    task = generateqinfo.delay(questions)
     
+    # Use `apply_async` instead of `delay` to get an AsyncResult
+    task = generateqinfo.apply_async(args=[questions])
+
     return jsonify({'task_id': task.id}), 200
 
 @app.route('/check_status/<task_id>', methods=['GET'])

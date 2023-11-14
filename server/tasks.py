@@ -18,39 +18,46 @@ celery = Celery(
 
 @celery.task()
 def generateqinfo(questions):
-    client = pymongo.MongoClient("mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority")
-    openai.api_key = openaikey
+    try:
+        client = pymongo.MongoClient("mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority")
+        openai.api_key = openaikey
 
-    db = client["LeedCode"]
-    collection = db["questions"]
+        db = client["LeedCode"]
+        collection = db["questions"]
 
-    for question in questions:
-        system_msg = "you are an AI machine that provides suitable examples and constraints for a given coding question"
-        user_msg = "provide examples and constraints in the format (examples: 'example', constraints: 'constraints') for the given programming question: " + question
+        for question in questions:
+            system_msg = "you are an AI machine that provides suitable examples and constraints for a given coding question"
+            user_msg = "provide examples and constraints in the format (examples: 'example', constraints: 'constraints') for the given programming question: " + question
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_msg},
-                {"role": "user", "content": user_msg}
-            ],
-            temperature=0.1
-        )
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_msg},
+                    {"role": "user", "content": user_msg}
+                ],
+                temperature=0.1
+            )
 
-        content = response['choices'][0]['message']['content']
-        sections = content.strip().split("Examples:")
-        constraints = sections[1].strip().split("Constraints:")
-        examples = constraints[0].strip()
-        constr = constraints[1].strip()
+            content = response['choices'][0]['message']['content']
+            sections = content.strip().split("Examples:")
+            constraints = sections[1].strip().split("Constraints:")
+            examples = constraints[0].strip()
+            constr = constraints[1].strip()
 
-        document = {
+            document = {
                 "question": question,
                 "examples": examples,
                 "constraints": constr
             }
 
             # Insert the document into MongoDB
-        collection.insert_one(document)
+            collection.insert_one(document)
+
+        return True  # Indicate success
+    except Exception as e:
+        # Log the exception
+        print(f"Error in generateqinfo: {str(e)}")
+        return False  # Indicate failure
 
 def check_status(task_id):
     try:

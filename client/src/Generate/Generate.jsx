@@ -7,7 +7,7 @@ function Generate() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [taskStatus, setTaskStatus] = useState(null);
-  const [taskId, setTaskId] = useState(null); // New state for task_id
+  const [taskId, setTaskId] = useState(null); 
 
   const generateQuestions = async (e) => {
     e.preventDefault();
@@ -56,15 +56,14 @@ function Generate() {
     try {
       setLoading(true);
   
-      // Assuming taskId is a state variable
       const response = await fetch(`/check_status/${taskId}`);
       
-      if (response.ok) {  // Checking if the response status is in the range 200-299
+      if (response.ok) {  
         const data = await response.json();
         setTaskStatus(data.status);
         console.log(taskStatus)
       } else {
-        // Handle non-successful response (e.g., display an error message)
+        
         console.error(`Error checking task status. Server response: ${response.status}`);
       }
     } catch (error) {
@@ -73,11 +72,13 @@ function Generate() {
       setLoading(false);
     }
   };
-  
+  console.log(questions.length)
 
   return (
     <div className="generator-container body">
       <div className="generator-canvas">
+      {questions.length == 0 &&(
+        <>
         <h1>Question Generator</h1>
         <form onSubmit={generateQuestions}>
           <textarea
@@ -92,6 +93,8 @@ function Generate() {
             Generate Questions
           </button>
         </form>
+        </>
+        )}
         <h3>Generated Questions</h3>
         {loading && <p>Loading...</p>}
         {questions.length > 0 && (
