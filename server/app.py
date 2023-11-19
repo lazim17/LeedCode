@@ -15,7 +15,8 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400
 openaikey = config('OPENAI_API_KEY')
 
 
-# Establish a MongoDB connection and get the "LeedCode" database
+
+
 client = MongoClient('mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority')
 db = client.get_database('LeedCode')
 jwt = JWTManager(app)
@@ -83,7 +84,6 @@ def generateq():
     
 
 
-
 @app.route('/run', methods=['POST'])
 def run_code():
     data = request.get_json()
@@ -93,43 +93,35 @@ def run_code():
     output = ''
     error = ''
 
-    if language == 'python':
-        try:
-            result = subprocess.run(['python', '-c', code], capture_output=True, text=True, timeout=10)
-            output = result.stdout
-            if result.returncode != 0:
-                error = result.stderr
-        except subprocess.CalledProcessError as e:
-            error = e.stderr
-        except subprocess.TimeoutExpired as e:
-            output = 'Timeout Error'
-            error = e.stderr
-        except Exception as e:
-            error = str(e)
-    elif language == 'cpp':
-        try:
-            result = subprocess.run(['g++', '-o', 'cpp_program', '-x', 'c++', '-', '-std=c++11'], input=code, capture_output=True, text=True, timeout=10)
-            if result.returncode == 0:
-                output = subprocess.run(['./cpp_program'], capture_output=True, text=True, timeout=10).stdout
-            else:
-                error = result.stderr
-        except subprocess.TimeoutExpired as e:
-            output = 'Timeout Error'
-            error = e.stderr
-        except Exception as e:
-            error = str(e)
+    try:
+        if language == 'python':
+            result = subprocess.run(['docker', 'run', '--rm', '-i', 'python-env', 'python', '-c', code], capture_output=True, text=True, timeout=10)
+        elif language == 'cpp':
+            result = subprocess.run(['docker', 'run', '--rm', '-i', 'cpp-env', 'sh', '-c', 'g++ -o my_cpp_program -xc++ - && ./my_cpp_program'], input=code, capture_output=True, text=True, timeout=10)
+        elif language == 'java':
+            result = subprocess.run(['docker', 'run', '--rm', '-i', 'java-env', 'sh', '-c', 'echo "$1" > Main.java && javac Main.java && java Main'], input=code, capture_output=True, text=True, timeout=10)
+        else:
+            raise ValueError(f'Unsupported language: {language}')
 
-    # Get the current timestamp
+        output = result.stdout
+        if result.returncode != 0:
+            error = result.stderr
+
+    except subprocess.TimeoutExpired as e:
+        output = 'Timeout Error'
+        error = e.stderr
+    except Exception as e:
+        error = str(e)
+
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     response_data = {
         'output': output,
         'error': error,
-        'compilation_info': f'Compiled and executed at {timestamp}',
+        'execution_info': f'Code executed at {timestamp}',
     }
 
     return jsonify(response_data)
-
 
 @app.route('/compile', methods=['POST'])
 def compile_code():
@@ -137,19 +129,30 @@ def compile_code():
     code = data.get('code', '')
     language = data.get('language', '')
 
-    if language == 'cpp':
-        try:
-            result = subprocess.run(['g++', '-o', 'cpp_program', '-x', 'c++', '-', '-std=c++11'], input=code, capture_output=True, text=True, timeout=10)
-            if result.returncode == 0:
-                return 'Compilation Successful'
-            else:
-                return result.stderr
-        except subprocess.TimeoutExpired as e:
-            return 'Timeout Error'
-        except Exception as e:
-            return 'An error occurred'
+    error = ''
 
+    try:
+        if language == 'cpp':
+            result = subprocess.run(['docker', 'run', '--rm', '-i', 'cpp-env', 'sh', '-c', 'echo "$1" > my_cpp_code.cpp && g++ -o my_cpp_program my_cpp_code.cpp -std=c++11'], input=code, capture_output=True, text=True, timeout=10)
+        elif language == 'java':
+            result = subprocess.run(['docker', 'run', '--rm', '-i', 'java-env', 'sh', '-c', 'echo "$1" > Main.java && javac Main.java'], input=code, capture_output=True, text=True, timeout=10)
+        else:
+            raise ValueError(f'Unsupported language for compilation: {language}')
 
+        if result.returncode != 0:
+            error = result.stderr
+
+    except subprocess.TimeoutExpired as e:
+        error = 'Timeout Error'
+    except Exception as e:
+        error = str(e)
+
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    if error:
+        return jsonify({'error': error, 'compilation_info': f'Compilation failed at {timestamp}'}), 400
+    else:
+        return jsonify({'compilation_info': f'Compilation successful at {timestamp}'}), 200
 
 
 if __name__ == '__main__':

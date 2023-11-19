@@ -23,5 +23,41 @@ services:
     networks:
       - mynetwork
 
+  python_env:
+    image: python-env
+    build:
+      context: ./python-env
+      dockerfile: Dockerfile
+    working_dir: /usr/src/app
+    command: bash
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - mynetwork
+
+  cpp_env:
+    image: cpp-env
+    build:
+      context: ./cpp-env
+      dockerfile: Dockerfile
+    working_dir: /usr/src/app
+    command: bash
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - mynetwork
+
+  java_env:
+    image: java-env
+    build:
+      context: ./java-env
+      dockerfile: Dockerfile
+    working_dir: /usr/src/app
+    command: bash
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - mynetwork
+
 networks:
   mynetwork:
