@@ -142,15 +142,35 @@ def run_code():
             error = e.stderr
         except Exception as e:
             error = str(e)
+    elif language == 'java':
+        try:
 
-    # Get the current timestamp
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            class_name = extract_main_class_name(code)
+        # Save the Java code to a file
+            filepath = class_name + ".java"
+            with open(filepath, 'w') as file:
+                file.write(code)
+
+            # Compile Java code
+            result = subprocess.run(['javac', filepath], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                # Execute Java program
+                output = subprocess.run(['java', class_name], capture_output=True, text=True, timeout=10).stdout
+            else:
+                error = result.stderr
+
+        except subprocess.TimeoutExpired as e:
+            output = 'Timeout Error'
+            error = e.stderr
+        except Exception as e:
+            error = str(e)
 
     response_data = {
         'output': output,
         'error': error,
-        'compilation_info': f'Compiled and executed at {timestamp}',
+        
     }
+
 
     return jsonify(response_data)
 
@@ -172,8 +192,41 @@ def compile_code():
             return 'Timeout Error'
         except Exception as e:
             return 'An error occurred'
+    elif language == 'java':
+        try:
 
+            class_name = extract_main_class_name(code)
+        # Save the Java code to a file
+            filepath = class_name + ".java"
+            with open(filepath, 'w') as file:
+                file.write(code)
 
+        # Compile Java code
+            result = subprocess.run(['javac', filepath], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                return 'Compilation Successful'
+            else:
+                return result.stderr
+
+        except subprocess.TimeoutExpired as e:
+            return 'Timeout Error'
+        except Exception as e:
+            return 'An error occurred'
+
+def extract_main_class_name(code):
+    try:
+        # Use a regular expression to find the class with the main method
+        match = re.search(r'public\s+class\s+(\w+)\s*\{[^}]*\bpublic\s+static\s+void\s+main\s*\(', code)
+        if match:
+            return match.group(1)
+        else:
+            # If no main class is found, return the first class found
+            match = re.search(r'public\s+class\s+(\w+)', code) or re.search(r'class\s+(\w+)', code)
+            return match.group(1) if match else None
+
+    except Exception as e:
+        print(f'Error extracting main class name: {str(e)}')
+        return None
 
 
 if __name__ == '__main__':

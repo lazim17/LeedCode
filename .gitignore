@@ -3,6 +3,11 @@
 /server/.env
 /server/.venv
 
+#user-code files
+/server/*.java
+/server/*.class
+/server/cpp_program.exe
+
 # dependencies
 /client/node_modules
 /client/.pnp

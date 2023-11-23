@@ -152,8 +152,9 @@ const CodeEditor = () => {
               <option value="">Select Language</option>
               <option value="python">Python</option>
               <option value="cpp">C++</option>
+              <option value="java">Java</option>
             </select>
-            {selectedLanguage === "cpp" && (
+            {selectedLanguage === "cpp" || selectedLanguage === "java" && (
               <button onClick={compileCode}>Compile</button>
             )}
             <button onClick={runCode}>Run</button>
