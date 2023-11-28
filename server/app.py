@@ -98,7 +98,58 @@ def handle_check_status(task_id):
     result = check_status(task_id)
     return result
 
+@app.route('/form', methods=['POST'])
+def formsubmit():
+    data = request.get_json()
+    company = data.get('companyName')
+    role = data.get('jobRole')
+    regstart = data.get('registrationStartDate')
+    regend = data.get('registrationEndDate')
+    startdate = data.get('examStartDate')
 
+    collection = db['Employer']
+
+    existing = collection.find_one({'name': company})
+
+    if existing:
+        company_id = existing['_id']
+
+        newexam = {
+            'role': role,
+            'registration_start_date': regstart,
+            'registration_end_date': regend,
+            'exam_start_date': startdate,
+        }
+
+        result = collection.update_one(
+            {'_id': company_id},  # Fix: use 'company_id' instead of 'existing_company_id'
+            {'$push': {'exams': newexam}}
+        )
+
+        if result.acknowledged:
+            return jsonify({'message': 'Added new exam'})
+        else:
+            return jsonify({'message': 'Error adding exam'})
+    else:
+        employer = {
+            'name': company,
+            'exams': [
+                {
+                    'role': role,
+                    'registration_start_date': regstart,
+                    'registration_end_date': regend,
+                    'exam_start_date': startdate,
+                }
+            ]
+            # Add other fields as needed
+        }
+
+        result = collection.insert_one(employer)
+
+        if result.acknowledged:
+            return jsonify({'message': 'Data inserted successfully'})
+        else:
+            return jsonify({'message': 'Error inserting data'})
 
         
     
