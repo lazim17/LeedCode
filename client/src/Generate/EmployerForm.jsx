@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
+import TokenContext from "../context/AuthProvider";
 
 const EmployerForm = () => {
+
+  const { token } = useContext(TokenContext);
+
   const [formData, setFormData] = useState({
     companyName: '',
     jobRole: '',
     registrationStartDate: '',
     registrationEndDate: '',
     examStartDate: '',
-    // Add other fields as needed
   });
 
   const handleChange = (e) => {
@@ -21,7 +24,8 @@ const EmployerForm = () => {
       const response = await fetch("/form", {
         method: 'POST',
         body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`, },
       });
 
       if (response.status === 200) {

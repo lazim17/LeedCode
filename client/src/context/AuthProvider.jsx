@@ -8,12 +8,12 @@ export const TokenProvider = ({ children }) => {
   
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role"));
-  console.log(token)
-  console.log(localStorage.getItem('Username'))
-  console.log(localStorage.getItem('status'))
+  const [taskId, setTaskId] = useState(localStorage.getItem("taskId"));
+  const [taskStatus, setTaskStatus] = useState(localStorage.getItem("taskStatus"));
+
 
   return (
-    <TokenContext.Provider value={{ token, role, setToken, setRole }}>
+    <TokenContext.Provider value={{ token, role, setToken, setRole, taskId, setTaskId,taskStatus, setTaskStatus }}>
       {children}
     </TokenContext.Provider>
   );

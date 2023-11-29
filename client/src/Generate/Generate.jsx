@@ -1,13 +1,17 @@
 // Generate.jsx
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import './Generate.css';
+import EmployerForm from "./EmployerForm";
+import TokenContext from "../context/AuthProvider";
 
 function Generate() {
   const [body, setBody] = useState("");
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [taskStatus, setTaskStatus] = useState(null);
-  const [taskId, setTaskId] = useState(null); 
+  const {taskStatus, setTaskStatus,taskId, setTaskId} = useContext(TokenContext);
+  const [form, setForm] = useState(null); 
+  
+
 
   const generateQuestions = async (e) => {
     e.preventDefault();
@@ -44,6 +48,8 @@ function Generate() {
         const data = await response.json();
         console.log(data.task_id);
         setTaskId(data.task_id)
+        localStorage.setItem("taskId",data.taskId)
+        setForm(true)
       }
     } catch (error) {
       console.error("Error processing questions:", error);
@@ -61,6 +67,7 @@ function Generate() {
       if (response.ok) {  
         const data = await response.json();
         setTaskStatus(data.status);
+        localStorage.setItem("taskStatus",data.status)
         console.log(taskStatus)
       } else {
         
@@ -77,7 +84,7 @@ function Generate() {
   return (
     <div className="generator-container body">
       <div className="generator-canvas">
-      {questions.length == 0 &&(
+      {questions.length == 0 && !form &&(
         <>
         <h1>Question Generator</h1>
         <form onSubmit={generateQuestions}>
@@ -95,16 +102,16 @@ function Generate() {
         </form>
         </>
         )}
-        <h3>Generated Questions</h3>
+        {(!form && <h3>Generated Questions</h3>)}
         {loading && <p>Loading...</p>}
-        {questions.length > 0 && (
+        {questions.length > 0 && !form && (
           <ul>
             {questions.map((question, index) => (
               <li key={index}>{question}</li>
             ))}
           </ul>
         )}
-        {questions.length > 0 && (
+        {questions.length > 0 && !form && (
           <>
             <button
               className="btn btn-success mt-2"
@@ -124,10 +131,12 @@ function Generate() {
                 Check Status
               </button>
             </div>
+
             
           </>
         )}
-      </div>
+        {(form && <EmployerForm />)} 
+         </div>
     </div>
   );
 }

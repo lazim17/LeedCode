@@ -2,6 +2,7 @@
 
 /server/.env
 /server/.venv
+/server/deleteall.py
 
 #user-code files
 /server/*.java

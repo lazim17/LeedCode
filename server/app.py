@@ -7,7 +7,7 @@ import re
 from decouple import config
 from datetime import datetime
 from pymongo import MongoClient
-from flask_jwt_extended import JWTManager,create_access_token
+from flask_jwt_extended import JWTManager,create_access_token,jwt_required, get_jwt_identity
 from tasks import generateqinfo,check_status,celery
 
 app = Flask(__name__)
@@ -36,7 +36,7 @@ def login():
 
         user = db.users.find_one({"username": username})
 
-        if user and user.get('password') == password:  # Use get() method to safely access the password
+        if user and user.get('password') == password:  
             token = create_access_token(identity=str(user['_id']))
             role = user.get('role')
             return jsonify({"token": token, "role":role}),200
@@ -98,7 +98,9 @@ def handle_check_status(task_id):
     result = check_status(task_id)
     return result
 
+
 @app.route('/form', methods=['POST'])
+@jwt_required()
 def formsubmit():
     data = request.get_json()
     company = data.get('companyName')
@@ -106,14 +108,13 @@ def formsubmit():
     regstart = data.get('registrationStartDate')
     regend = data.get('registrationEndDate')
     startdate = data.get('examStartDate')
+    user_id = get_jwt_identity()
 
     collection = db['Employer']
 
     existing = collection.find_one({'name': company})
 
     if existing:
-        company_id = existing['_id']
-
         newexam = {
             'role': role,
             'registration_start_date': regstart,
@@ -121,20 +122,22 @@ def formsubmit():
             'exam_start_date': startdate,
         }
 
-        result = collection.update_one(
-            {'_id': company_id},  # Fix: use 'company_id' instead of 'existing_company_id'
+        # Update the existing employer
+        result = collection.find_one_and_update(
+            {'_id': user_id},
             {'$push': {'exams': newexam}}
         )
 
-        if result.acknowledged:
+        if result:
             return jsonify({'message': 'Added new exam'})
         else:
             return jsonify({'message': 'Error adding exam'})
     else:
         employer = {
-            'name': company,
+            'company-name': company,
             'exams': [
                 {
+                    'user_id': str(user_id),
                     'role': role,
                     'registration_start_date': regstart,
                     'registration_end_date': regend,
@@ -144,6 +147,7 @@ def formsubmit():
             # Add other fields as needed
         }
 
+        # Insert a new employer
         result = collection.insert_one(employer)
 
         if result.acknowledged:
@@ -151,7 +155,6 @@ def formsubmit():
         else:
             return jsonify({'message': 'Error inserting data'})
 
-        
     
 
 
