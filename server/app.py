@@ -9,6 +9,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token,jwt_required, get_jwt_identity
 from tasks import generateqinfo,check_status,celery
+from bson import ObjectId
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
@@ -86,10 +87,13 @@ def generateq():
 @app.route('/qinfo', methods=['POST'])
 def qinfo():
     data = request.get_json()
-    questions = data.get('questions', [])
-    
-    # Use `apply_async` instead of `delay` to get an AsyncResult
-    task = generateqinfo.apply_async(args=[questions])
+    examid = data.get('examid')
+    userid = data.get('userid')
+    print(f"Received exam ID from JSON: {examid}")
+    print(f"Received user ID from JSON: {userid}")
+    details = {'examId': examid, 'userId': userid}
+    print(f"Details dictionary before calling Celery task: {details}")
+    task = generateqinfo.apply_async(args=[details])
 
     return jsonify({'task_id': task.id}), 200
 
@@ -98,29 +102,127 @@ def handle_check_status(task_id):
     result = check_status(task_id)
     return result
 
-
 @app.route('/form', methods=['POST'])
 @jwt_required()
 def formsubmit():
-    data = request.get_json()
-    company = data.get('companyName')
-    role = data.get('jobRole')
-    regstart = data.get('registrationStartDate')
-    regend = data.get('registrationEndDate')
-    startdate = data.get('examStartDate')
-    user_id = get_jwt_identity()
+    try:
+        # Get the user identity from the JWT
+        user_id = get_jwt_identity()
 
-    collection = db['Employer']
+        # Extract data from the JSON request
+        data = request.get_json()
 
-    existing = collection.find_one({'name': company})
+        # Extract relevant data for employer
+        company = data.get('formData', {}).get('companyName')
+        role = data.get('formData', {}).get('jobRole')
+        regstart = data.get('formData', {}).get('registrationStartDate')
+        regend = data.get('formData', {}).get('registrationEndDate')
+        startdate = data.get('formData', {}).get('examStartDate')
+        questions = data.get('questions', [])
+
+        existing_employer = db['Employer'].find_one({"name": company})
+
+        new_exam_id = ObjectId()
+        new_question_ids = [ObjectId() for _ in questions]
+
+        if existing_employer:
+            new_exam = {
+                "exam_id": new_exam_id,
+                "role": role,
+                "questions": [
+                    {
+                        "question_id": question_id,
+                        "text": question,
+                        'examples': [],
+                        'constraints': []
+                    } for question_id, question in zip(new_question_ids, questions)
+                ]
+            }
+
+            result = db['Employer'].update_one(
+                {"name": company},
+                {"$push": {"exams": new_exam}}
+            )
+
+            if result.acknowledged:
+                return jsonify({
+                    "message": "Form submitted successfully",
+                    "userid": str(user_id),
+                    "examid": str(new_exam_id)
+                }), 201
+            else:
+                return jsonify({"message": "Failed to update existing employer"}), 500
+
+        else:
+            employer_document = {
+                "_id": ObjectId(user_id),
+                "name": company,
+                "exams": [
+                    {
+                        "exam_id": new_exam_id,
+                        "role": role,
+                        "questions": [
+                            {
+                                "question_id": question_id,
+                                "text": question,
+                                'examples': [],
+                                'constraints': []
+                            } for question_id, question in zip(new_question_ids, questions)
+                        ]
+                    }
+                ]
+            }
+
+            result = db['Employer'].insert_one(employer_document)
+
+            if result.acknowledged:
+                return jsonify({
+                    "message": "Form submitted successfully",
+                    "userid": str(user_id),
+                    "examid": str(new_exam_id)
+                }), 201
+            else:
+                return jsonify({"message": "Failed to insert new employer"}), 500
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    existing = collection.find_one({'_id': ObjectId(user_id)})
 
     if existing:
         newexam = {
+            'user_id': str(user_id),
+            'exam_id': str(ObjectId()),
             'role': role,
             'registration_start_date': regstart,
             'registration_end_date': regend,
             'exam_start_date': startdate,
+            'questions': [
+                {
+                    'question_id': str(ObjectId()),  # Generate a new ObjectId for each question
+                    'question': question,
+                    'examples': [],
+                    'constraints': []
+                } for question in questions
+            ]
         }
+        
 
         # Update the existing employer
         result = collection.find_one_and_update(
@@ -129,7 +231,7 @@ def formsubmit():
         )
 
         if result:
-            return jsonify({'message': 'Added new exam'})
+            return jsonify({'message': 'Added new exam','examid':newexam['exam_id'],'userid':existing['_id']})
         else:
             return jsonify({'message': 'Error adding exam'})
     else:
@@ -138,20 +240,30 @@ def formsubmit():
             'exams': [
                 {
                     'user_id': str(user_id),
+                    'exam_id': str(ObjectId()),
                     'role': role,
                     'registration_start_date': regstart,
                     'registration_end_date': regend,
                     'exam_start_date': startdate,
+                    'questions': [
+                        {
+                            'question_id': str(ObjectId()),  # Generate a new ObjectId for each question
+                            'question': question,
+                            'examples': [],
+                            'constraints': []
+                        } for question in questions
+                    ]
                 }
             ]
-            # Add other fields as needed
         }
 
         # Insert a new employer
         result = collection.insert_one(employer)
+        inserted_id = result.inserted_id
 
         if result.acknowledged:
-            return jsonify({'message': 'Data inserted successfully'})
+            return jsonify({'message': 'Data inserted successfully', 'examid': str(employer['exams'][0]['exam_id']), 'userid': str(inserted_id)})
+
         else:
             return jsonify({'message': 'Error inserting data'})
 

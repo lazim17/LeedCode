@@ -48,12 +48,7 @@ const Navbar = () => {
             )}
             {role === "admin" && token && (
               <li className="generate">
-                <Link to="/generate">Generate Questions (Beta)</Link>
-              </li>
-            )}
-            {role === "admin" && token && (
-              <li className="generate">
-                <Link to="/empform">Form</Link>
+                <Link to="/generate">Create Exam (Beta)</Link>
               </li>
             )}
             <li className="login">

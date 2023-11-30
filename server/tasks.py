@@ -3,6 +3,7 @@ from celery import Celery
 from celery.result import AsyncResult
 import pymongo
 import openai
+from bson import ObjectId
 from flask import jsonify
 from decouple import config
 
@@ -14,20 +15,24 @@ celery = Celery(
     backend='redis://localhost:6379/1'
 )
 
-
-
+        
 @celery.task()
-def generateqinfo(questions):
-    try:
-        client = pymongo.MongoClient("mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority")
+def generateqinfo(details):
+    # Move MongoDB and OpenAI connections into the try block
+    with pymongo.MongoClient("mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?retryWrites=true&w=majority") as client:
         openai.api_key = openaikey
 
         db = client["LeedCode"]
-        collection = db["questions"]
+        collection = db["Employer"]
+        examid = details['examId']
+        userid = details['userId']
+        user_id = ObjectId(userid)
+        exam_id = ObjectId(examid)
+        questions = list(collection.find({"_id": user_id, "exams.exam_id": exam_id}, {"exams.$": 1}))
 
-        for question in questions:
+        for question in questions[0]["exams"][0]["questions"]:
             system_msg = "you are an AI machine that provides suitable examples and constraints for a given coding question"
-            user_msg = "provide examples and constraints in the format (examples: 'example', constraints: 'constraints') for the given programming question: " + question
+            user_msg = "provide examples and constraints in the format (examples: 'example', constraints: 'constraints') for the given programming question: " + question["text"]
 
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -44,20 +49,30 @@ def generateqinfo(questions):
             examples = constraints[0].strip()
             constr = constraints[1].strip()
 
-            document = {
-                "question": question,
-                "examples": examples,
-                "constraints": constr
-            }
+            # Update the specific question in the MongoDB collection using the filtered positional operator
+            result = collection.update_one(
+                {
+                    "_id": user_id,
+                    "exams.exam_id": exam_id,
+                    "exams.questions.question_id": question["question_id"]
+                },
+                {"$set": {
+                    "exams.$[exam].questions.$[ques].examples": examples,
+                    "exams.$[exam].questions.$[ques].constraints": constr
+                }},
+                array_filters=[
+                    {"exam.exam_id": exam_id},
+                    {"ques.question_id": question["question_id"]}
+                ]
+            )
 
-            # Insert the document into MongoDB
-            collection.insert_one(document)
+            if result.acknowledged:
+                print("Success")
+            else:
+                print("Error")
 
-        return True  # Indicate success
-    except Exception as e:
-        # Log the exception
-        print(f"Error in generateqinfo: {str(e)}")
-        return False  # Indicate failure
+    
+
 
 def check_status(task_id):
     try:
