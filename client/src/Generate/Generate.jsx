@@ -2,24 +2,34 @@
 import React, { useContext, useState,useEffect } from "react";
 import './Generate.css';
 import TokenContext from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 function Generate() {
   const [body, setBody] = useState("");
-
-
-  const [examId, setExamid] = useState(null);
+  const [examId, setExamid] = useState(() => {
+    const storedExamId = sessionStorage.getItem("examId");
+    return storedExamId !== null ? storedExamId : null;
+  });
+  
+  const [taskId, setTaskId] = useState(() => {
+    const storedTaskId = sessionStorage.getItem("taskId");
+    return storedTaskId !== null ? storedTaskId : null;
+  });
   const [userId, setUserid] = useState(null);
   const [loading, setLoading] = useState(false);
-  const {taskStatus, setTaskStatus,taskId, setTaskId} = useContext(TokenContext);
+  const {taskStatus, setTaskStatus} = useContext(TokenContext);
   const [questions, setQuestions] = useState(() => {
     const storedQuestions = JSON.parse(localStorage.getItem("questions")) || [];
     return storedQuestions;
   });
+
   const [form, setForm] = useState(() => {
     const storedFormStatus = JSON.parse(localStorage.getItem("form"));
     return storedFormStatus !== null ? storedFormStatus : null;
   });
-  const { token } = useContext(TokenContext);
+  const { token,setIds,idDictionary } = useContext(TokenContext);
+  const navigate = useNavigate();
+
 
   const [formData, setFormData] = useState(() => {
     const storedFormData = JSON.parse(localStorage.getItem("formData")) || {
@@ -48,10 +58,59 @@ function Generate() {
     };
 
     useEffect(() => {
+      if (examId && taskId && !loading) {
+      
+      sessionStorage.removeItem("taskId")
+      sessionStorage.removeItem("examId")
+      navigate("/empdash");
+      }
+    }, [examId, taskId, loading, navigate]);
+
+    useEffect(() => {
       // Save form data to session storage whenever it changes
       localStorage.setItem("formData", JSON.stringify(formData));
-    }, [formData]);
-  
+      console.log(idDictionary);
+    }, [formData, idDictionary]);
+    
+    useEffect(() => {
+      // Call setIds when both examId and taskId are available
+      if (examId && taskId) {
+        setIds(examId, taskId);
+        console.log("Updated examId:", examId);
+        console.log("Updated taskId:", taskId);
+        console.log("Updated form:", form);
+        console.log("Updated questions:", questions);
+      }
+    }, [examId, taskId,form, questions]);
+    useEffect(() => {
+      console.log("Updated form:", form);
+      console.log("Updated questions:", questions);
+    }, []);
+
+    
+    
+    const checkStatus = async () => {
+      try {
+        setLoading(true);
+    
+        const response = await fetch(`/check_status/${taskId}`);
+        
+        if (response.ok) {  
+          
+          const data = await response.json();
+          setTaskStatus(data.status);
+          localStorage.setItem("taskStatus",data.status)
+          console.log(taskStatus)
+        } else {
+          
+          console.error(`Error checking task status. Server response: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error checking task status:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
 
   const generateQuestions = async (e) => {
@@ -96,12 +155,9 @@ function Generate() {
         const data = await response1.json();
         console.log(formData)
         console.log(data.message);
-        console.log(data.userid)
-        setUserid(data.userid)
-        console.log(userId);
-        console.log(data.examid)
-        setExamid(data.examid)
-        console.log(examId)
+        setUserid(data.userid);
+        setExamid(data.examid);
+        sessionStorage.setItem("examId", data.examid);
         if (data.examid && data.userid) {
           const response2 = await fetch("/qinfo", {
             method: "POST",
@@ -111,38 +167,25 @@ function Generate() {
 
         if (response2.status === 200) {
           const data = await response2.json();
-          console.log(data.task_id);
-          setTaskId(data.task_id)
-          localStorage.setItem("taskId",data.taskId)         
+          setTaskId(data.task_id);
+          sessionStorage.setItem("taskId", data.task_id);       
+
+          
+
         }
       }
+      setQuestions([]);
+      setForm(null);
+      localStorage.removeItem("form")
+      
+      localStorage.removeItem("questions")
     }
   } catch (error) {
       console.error("Error processing questions:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const checkStatus = async () => {
-    try {
-      setLoading(true);
-  
-      const response = await fetch(`/check_status/${taskId}`);
       
-      if (response.ok) {  
-        const data = await response.json();
-        setTaskStatus(data.status);
-        localStorage.setItem("taskStatus",data.status)
-        console.log(taskStatus)
-      } else {
-        
-        console.error(`Error checking task status. Server response: ${response.status}`);
-      }
-    } catch (error) {
-      console.error("Error checking task status:", error);
-    } finally {
-      setLoading(false);
+
     }
   };
 
@@ -248,17 +291,7 @@ function Generate() {
               Process Questions
             </button>
             
-            <div>
-              <p>Task Status: {taskStatus}</p>
-              <button
-                className="btn btn-info mt-2"
-                onClick={checkStatus}
-                
-              >
-                Check Status
-              </button>
-            </div>
-
+            
             
           </>
         )}

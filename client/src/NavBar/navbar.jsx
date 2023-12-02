@@ -1,5 +1,5 @@
 // Navbar.js
-import React, { useContext } from "react";
+import React, { useContext,useEffect } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "./navbar.css";
 import TokenContext, { TokenProvider } from "../context/AuthProvider";
@@ -22,14 +22,12 @@ const Navbar = () => {
       navigate("/");
     }
   };
-
-  function Button() {
-    if (token) {
-      <Link to="/student">Dashboard</Link>;
-    } else {
-      <Link to="/login">Login</Link>;
+  useEffect(() => {
+    if (role) {
+      console.log("User Role:", role);
     }
-  }
+  });
+
 
   return (
     <div>

@@ -43,6 +43,7 @@ export default function StudentLogin() {
         setRole(role);
         console.log(role);
         localStorage.setItem("token", token);
+        localStorage.setItem("role", role);
         localStorage.setItem("status", "logged in");
         localStorage.setItem("Username", loginData.username);
         if (role == "student") {

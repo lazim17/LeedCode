@@ -129,6 +129,9 @@ def formsubmit():
             new_exam = {
                 "exam_id": new_exam_id,
                 "role": role,
+                "regstart":regstart,
+                "regend":regend,
+                "examstart":startdate,
                 "questions": [
                     {
                         "question_id": question_id,
@@ -161,6 +164,9 @@ def formsubmit():
                     {
                         "exam_id": new_exam_id,
                         "role": role,
+                        "regstart":regstart,
+                        "regend":regend,
+                        "examstart":startdate,
                         "questions": [
                             {
                                 "question_id": question_id,
@@ -190,84 +196,57 @@ def formsubmit():
         
 
 
+# Update the route to match the endpoint used in the React component
+@app.route('/empdashboard', methods=['GET'])
+@jwt_required()
+def dashboard():
+    try:
+        # Get the user identity from the JWT
+        user_id = get_jwt_identity()
 
+        # Retrieve exam details for the user from the database
+        user_exams = db['Employer'].find_one({"_id": ObjectId(user_id)}, {"exams": 1})
 
+        if user_exams:
+            exams_data = user_exams.get('exams', [])
+            formatted_exams = []
 
-
-
-
-
-
-
-
-
-
-
-    existing = collection.find_one({'_id': ObjectId(user_id)})
-
-    if existing:
-        newexam = {
-            'user_id': str(user_id),
-            'exam_id': str(ObjectId()),
-            'role': role,
-            'registration_start_date': regstart,
-            'registration_end_date': regend,
-            'exam_start_date': startdate,
-            'questions': [
-                {
-                    'question_id': str(ObjectId()),  # Generate a new ObjectId for each question
-                    'question': question,
-                    'examples': [],
-                    'constraints': []
-                } for question in questions
-            ]
-        }
-        
-
-        # Update the existing employer
-        result = collection.find_one_and_update(
-            {'_id': user_id},
-            {'$push': {'exams': newexam}}
-        )
-
-        if result:
-            return jsonify({'message': 'Added new exam','examid':newexam['exam_id'],'userid':existing['_id']})
-        else:
-            return jsonify({'message': 'Error adding exam'})
-    else:
-        employer = {
-            'company-name': company,
-            'exams': [
-                {
-                    'user_id': str(user_id),
-                    'exam_id': str(ObjectId()),
-                    'role': role,
-                    'registration_start_date': regstart,
-                    'registration_end_date': regend,
-                    'exam_start_date': startdate,
-                    'questions': [
+            for exam in exams_data:
+                formatted_exam = {
+                    "exam_id": str(exam['exam_id']),
+                    "role": exam.get('role'),
+                    "regstart":exam.get('regstart'),
+                    "regend":exam.get('regend'),
+                    "examstart":exam.get('examstart'),
+                    "questions": [
                         {
-                            'question_id': str(ObjectId()),  # Generate a new ObjectId for each question
-                            'question': question,
-                            'examples': [],
-                            'constraints': []
-                        } for question in questions
+                            "question_id": str(question['question_id']),
+                            "text": question.get('text'),
+                            "examples": question.get('examples', []),
+                            "constraints": question.get('constraints', [])
+                        } for question in exam.get('questions', [])
                     ]
                 }
-            ]
-        }
+                formatted_exams.append(formatted_exam)
 
-        # Insert a new employer
-        result = collection.insert_one(employer)
-        inserted_id = result.inserted_id
-
-        if result.acknowledged:
-            return jsonify({'message': 'Data inserted successfully', 'examid': str(employer['exams'][0]['exam_id']), 'userid': str(inserted_id)})
+            return jsonify({"examDetails": formatted_exams}), 200
 
         else:
-            return jsonify({'message': 'Error inserting data'})
+            return jsonify({"message": "User not found"}), 404
 
-    
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
 
 
 

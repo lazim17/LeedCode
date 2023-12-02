@@ -8,7 +8,6 @@ import StudentDashboard from "./LoginForms/StudentDashboard";
 import EmployerDashboard from "./LoginForms/EmployerDashboard";
 import HomePage from "./Homepage/HomePage";
 import Generate from "./Generate/Generate";
-import EmployerForm from "./Generate/EmployerForm";
 
 
 //Authentication Context
@@ -30,7 +29,8 @@ export default function App() {
           <Route path="/generate" element={<Generate />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/employer" element={<EmployerDashboard />} />
-          <Route path="/empform" element={<EmployerForm />} />
+          <Route path="/empdash" element={<EmployerDashboard />} />
+
 
 
         </Route>
