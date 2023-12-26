@@ -1,15 +1,18 @@
 import React, { useContext, useEffect,useState } from "react";
 import TokenContext from "../context/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link} from "react-router-dom";
 
 
 const ExamCard = ({ exam, onClick }) => {
+  const registrationLink = `/register/${exam.exam_id}`;
+
   return (
     <div style={{ border: '1px solid #ddd', padding: '10px', margin: '10px', cursor: 'pointer' }} onClick={onClick}>
       <h3>{exam.role}</h3>
-      <p>Exam ID: {exam.exam_id.toString()}</p>
-
-      {/* Add more details as needed */}
+      <p>
+        <span>Registration Link: </span>
+        <Link to={registrationLink}>Register for Exam</Link>
+      </p>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Outlet } from "react-router";
 import Login from "./LoginForms/Login";
 import StudentDashboard from "./LoginForms/StudentDashboard";
 import EmployerDashboard from "./LoginForms/EmployerDashboard";
+import RegistrationForm from "./LoginForms/RegistrationForm";
 import HomePage from "./Homepage/HomePage";
 import Generate from "./Generate/Generate";
 
@@ -30,6 +31,8 @@ export default function App() {
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/employer" element={<EmployerDashboard />} />
           <Route path="/empdash" element={<EmployerDashboard />} />
+          <Route path="/register/:examid" element={<RegistrationForm />} />
+
 
 
 

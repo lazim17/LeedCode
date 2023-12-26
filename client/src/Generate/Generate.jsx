@@ -169,16 +169,15 @@ function Generate() {
           const data = await response2.json();
           setTaskId(data.task_id);
           sessionStorage.setItem("taskId", data.task_id);       
-
+          setQuestions([]);
+          setForm(null);
+          localStorage.removeItem("form")
+          localStorage.removeItem("questions")
           
 
         }
       }
-      setQuestions([]);
-      setForm(null);
-      localStorage.removeItem("form")
       
-      localStorage.removeItem("questions")
     }
   } catch (error) {
       console.error("Error processing questions:", error);
