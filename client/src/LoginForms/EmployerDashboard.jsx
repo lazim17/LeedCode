@@ -3,8 +3,8 @@ import TokenContext from "../context/AuthProvider";
 import { useNavigate,Link} from "react-router-dom";
 
 
-const ExamCard = ({ exam, onClick }) => {
-  const registrationLink = `/register/${exam.exam_id}`;
+const ExamCard = ({ exam, employerId, onClick }) => {
+  const registrationLink = `/registerr/${exam.userid}/${exam.exam_id}`;
 
   return (
     <div style={{ border: '1px solid #ddd', padding: '10px', margin: '10px', cursor: 'pointer' }} onClick={onClick}>
@@ -13,9 +13,11 @@ const ExamCard = ({ exam, onClick }) => {
         <span>Registration Link: </span>
         <Link to={registrationLink}>Register for Exam</Link>
       </p>
+      {/* Add more details as needed */}
     </div>
   );
 };
+
 
 
 

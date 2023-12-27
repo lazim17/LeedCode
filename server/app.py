@@ -3,16 +3,34 @@ from flask_cors import CORS
 import subprocess
 import openai
 import os
+import random
+import string
 import re
 from decouple import config
-from datetime import datetime
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token,jwt_required, get_jwt_identity
 from tasks import generateqinfo,check_status,celery
 from bson import ObjectId
+from flask_mail import Mail,Message
 
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = "MySuperSecretKey123!$%*^&"
+
+app.config['MAIL_SERVER'] = "smtp.googlemail.com"
+
+app.config['MAIL_PORT'] = 587
+
+app.config['MAIL_USE_TLS'] = True
+
+app.config['MAIL_USERNAME'] = "internshipleadsoc@gmail.com"
+
+app.config['MAIL_PASSWORD'] = "pzxu uqib wcmk ddiu "
+
+mail = Mail(app)
+
+
+
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400
 openaikey = config('OPENAI_API_KEY')
 
@@ -213,6 +231,7 @@ def dashboard():
 
             for exam in exams_data:
                 formatted_exam = {
+                    "userid": str(user_id),
                     "exam_id": str(exam['exam_id']),
                     "role": exam.get('role'),
                     "regstart":exam.get('regstart'),
@@ -237,15 +256,65 @@ def dashboard():
     except Exception as e:
         return jsonify({"message": str(e)}), 500
 
+def temppassword(first_name, last_name):
+    # Combine first name, last name, and a random string
+    temp_password = f"{first_name.lower()}{last_name.lower()}{''.join(random.choices(string.ascii_letters + string.digits, k=6))}"
+
+    return temp_password
+
+@app.route('/studentregs', methods=['POST'])
+def apply():
+    try:
+        data = request.get_json()
+        employer_id = data.get('employerId')
+        exam_id = data.get('examid')
+        form_data = data.get('formData', {})
+
+        fname = form_data.get('fname')
+        lname = form_data.get('lname')
+        email = form_data.get('email')
+        password = temppassword(fname, lname)  # Use a secure password hashing library
+
+        user_data = {
+            "username": email,
+            "password": password,
+            "role": "student",
+            "email": email,
+            "fname": fname,
+            "lname": lname
+        }
+        
+        employer_id = ObjectId(employer_id)
+        exam_id = ObjectId(exam_id)
+
+        user_insert_result = db['users'].insert_one(user_data)
+        new_user_id = user_insert_result.inserted_id
+
+        applicant_data = {
+            "user_id": new_user_id,
+        }
+
+        db['Employer'].update_one(
+            {"exams.exam_id": exam_id},
+            {"$push": {"exams.$.applicants": new_user_id}}
+        )
+
+        message = Message(
+            subject = 'oombbb',
+            recipients = [email],
+            sender = 'noreply@leadsoc.com'
+        )
+
+        message.body = "username is "+ email +" and passsword is " + password
+        mail.send(message)
 
 
+        return jsonify({'success': True, 'message': 'User registered successfully'})
 
+       
 
-
-
-
-
-
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
 
 
