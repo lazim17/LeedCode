@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
 import subprocess
 import openai
@@ -299,14 +299,51 @@ def apply():
             {"$push": {"exams.$.applicants": new_user_id}}
         )
 
+        html_content = '''
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Details and Verification</title>
+    <style>
+        /* Your existing CSS styles */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login Details and Verification</h2>
+        <p>Hello {email},</p>
+        <p>Thank you for registering for the [Exam Name] exam. Below are your login details:</p>
+        <ul>
+            <li><strong>Username:</strong> {email}</li>
+            <li><strong>Password:</strong> {password}</li>
+        </ul>
+        <p>For security reasons, we recommend changing your password. Click the button below to set a new password:</p>
+        <a href="{link}/{email}">Change Password</a>
+        <p>If you did not register for this exam or have any concerns, please contact us immediately.</p>
+        <p class="footer">Best regards,<br>Your Organization Name</p>
+    </div>
+</body>
+</html>
+
+        '''
+        link = "http://localhost:3000/change-password"
+        # Format the HTML content with dynamic values
+        html_content = html_content.format(email=email, password=password, link=link)
+
+        # Create the Message object
         message = Message(
-            subject = 'oombbb',
-            recipients = [email],
-            sender = 'noreply@leadsoc.com'
+            subject='Registration',
+            recipients=[email],
+            sender='noreply@leadsoc.com',
+            html=html_content  # Include the HTML content here
         )
 
-        message.body = "username is "+ email +" and passsword is " + password
+        # Send the email
         mail.send(message)
+
 
 
         return jsonify({'success': True, 'message': 'User registered successfully'})
@@ -317,8 +354,26 @@ def apply():
         return jsonify({'success': False, 'message': str(e)})
 
 
+@app.route('/changepassword', methods=['POST'])
+def change_password():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        current_password = data.get('currentPassword')
+        new_password = data.get('newPassword')
 
+        # Get the user from the database
+        user = db['users'].find_one({'username': username})
 
+        if user and user['password'] == current_password:
+            # Update the password
+            db['users'].update_one({'username': username}, {'$set': {'password': new_password}})
+            return jsonify({'success': True, 'message': 'Password changed successfully'})
+
+        return jsonify({'success': False, 'message': 'Invalid credentials'})
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
 
 #CODE-EDITOR
