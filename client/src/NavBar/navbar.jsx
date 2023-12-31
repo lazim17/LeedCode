@@ -1,6 +1,6 @@
 // Navbar.js
 import React, { useContext,useEffect } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate,useParams } from "react-router-dom";
 import "./navbar.css";
 import TokenContext, { TokenProvider } from "../context/AuthProvider";
 import HomePage from "../Homepage/HomePage";
@@ -8,10 +8,14 @@ import HomePage from "../Homepage/HomePage";
 const Navbar = () => {
   const location = useLocation();
   const { token, role, setToken, setRole } = useContext(TokenContext);
+  const { token: routeToken } = useParams();
+  const { examid: routeExamid } = useParams();
   const navigate = useNavigate();
 
-  // Conditionally render the navbar except on the /question route
-  const renderNavbar = location.pathname !== "/question";
+  const renderNavbar =
+    !["/question", "/change-password/:token"].includes(location.pathname) &&
+    !routeToken && !routeExamid;
+
 
   const handleLogout = async () => {
     if (token) {

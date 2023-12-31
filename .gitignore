@@ -3,6 +3,7 @@
 /server/.env
 /server/.venv
 /server/deleteall.py
+/server/delete.py
 
 #user-code files
 /server/*.java
