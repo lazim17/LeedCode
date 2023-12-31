@@ -6,6 +6,8 @@ import os
 import random
 import string
 import re
+from celery import Celery
+from itsdangerous import URLSafeTimedSerializer,SignatureExpired
 from decouple import config
 from pymongo import MongoClient
 from flask_jwt_extended import JWTManager,create_access_token,jwt_required, get_jwt_identity
@@ -29,7 +31,7 @@ app.config['MAIL_PASSWORD'] = "pzxu uqib wcmk ddiu "
 
 mail = Mail(app)
 
-
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400
 openaikey = config('OPENAI_API_KEY')
@@ -40,6 +42,13 @@ client = MongoClient('mongodb+srv://lazim:lazim@cluster0.inykpf1.mongodb.net/?re
 db = client.get_database('LeedCode')
 jwt = JWTManager(app)
 CORS(app)
+
+
+celery = Celery(
+    'app',
+    broker='redis://localhost:6379/2',
+    backend='redis://localhost:6379/3'
+)
 
 
 
@@ -257,10 +266,25 @@ def dashboard():
         return jsonify({"message": str(e)}), 500
 
 def temppassword(first_name, last_name):
-    # Combine first name, last name, and a random string
+    
     temp_password = f"{first_name.lower()}{last_name.lower()}{''.join(random.choices(string.ascii_letters + string.digits, k=6))}"
 
     return temp_password
+
+
+@app.route('/emaildecrypt', methods=['POST'])
+def emaildecrypt():
+    token = request.get_json()
+
+    try:
+
+        email = serializer.loads(token, max_age=3600).get('email')
+        return jsonify({'success': True, 'email': email})
+    except SignatureExpired:
+        return jsonify({'success': False, 'message': 'Token has expired.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
+
 
 @app.route('/studentregs', methods=['POST'])
 def apply():
@@ -273,7 +297,8 @@ def apply():
         fname = form_data.get('fname')
         lname = form_data.get('lname')
         email = form_data.get('email')
-        password = temppassword(fname, lname)  # Use a secure password hashing library
+        password = temppassword(fname, lname)  
+        token = serializer.dumps({'email': email, 'exp': 3600})
 
         user_data = {
             "username": email,
@@ -299,50 +324,10 @@ def apply():
             {"$push": {"exams.$.applicants": new_user_id}}
         )
 
-        html_content = '''
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Details and Verification</title>
-    <style>
-        /* Your existing CSS styles */
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Login Details and Verification</h2>
-        <p>Hello {email},</p>
-        <p>Thank you for registering for the [Exam Name] exam. Below are your login details:</p>
-        <ul>
-            <li><strong>Username:</strong> {email}</li>
-            <li><strong>Password:</strong> {password}</li>
-        </ul>
-        <p>For security reasons, we recommend changing your password. Click the button below to set a new password:</p>
-        <a href="{link}/{email}">Change Password</a>
-        <p>If you did not register for this exam or have any concerns, please contact us immediately.</p>
-        <p class="footer">Best regards,<br>Your Organization Name</p>
-    </div>
-</body>
-</html>
-
-        '''
-        link = "http://localhost:3000/change-password"
-        # Format the HTML content with dynamic values
-        html_content = html_content.format(email=email, password=password, link=link)
-
-        # Create the Message object
-        message = Message(
-            subject='Registration',
-            recipients=[email],
-            sender='noreply@leadsoc.com',
-            html=html_content  # Include the HTML content here
-        )
-
+        
+        send_async_email.apply_async(args=[email,password,token,fname])
         # Send the email
-        mail.send(message)
+        
 
 
 
@@ -352,6 +337,54 @@ def apply():
 
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
+
+
+
+@celery.task
+def send_async_email(email,password,token,fname):
+    html_content = '''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Login Details and Verification</title>
+            <style>
+                /* Your existing CSS styles */
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Login Details and Verification</h2>
+                <p>Hello {fname},</p>
+                <p>Thank you for registering for the [Exam Name] exam. Below are your login details:</p>
+                <ul>
+                    <li><strong>Username:</strong> {email}</li>
+                    <li><strong>Password:</strong> {password}</li>
+                </ul>
+                <p>For security reasons, we recommend changing your password. Click the button below to set a new password:</p>
+                <a href="{link}/{token}">Change Password</a>
+                <p>If you did not register for this exam or have any concerns, please contact us immediately.</p>
+                <p class="footer">Best regards,<br>Your Organization Name</p>
+            </div>
+        </body>
+        </html>
+
+        '''
+    link = "http://localhost:3000/change-password"
+        # Format the HTML content with dynamic values
+    html_content = html_content.format(email=email, password=password,token=token,fname=fname, link=link)
+
+        # Create the Message object
+    message = Message(
+            subject='Registration',
+            recipients=[email],
+            sender='noreply@leadsoc.com',
+            html=html_content  # Include the HTML content here
+    )
+    with app.app_context():
+      mail.send(message)  
 
 
 @app.route('/changepassword', methods=['POST'])

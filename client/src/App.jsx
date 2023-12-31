@@ -33,7 +33,7 @@ export default function App() {
           <Route path="/employer" element={<EmployerDashboard />} />
           <Route path="/empdash" element={<EmployerDashboard />} />
           <Route path="/registerr/:employerId/:examid" element={<Registration />} />
-          <Route path="/change-password/:email" element={<ChangePassword />} />
+          <Route path="/change-password/:token" element={<ChangePassword />} />
 
 
 

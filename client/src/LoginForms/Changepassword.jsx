@@ -1,14 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+
 
 const ChangePassword = () => {
-  const { email } = useParams();
+  const { token } = useParams();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+
+
+
   const [formData, setFormData] = useState({
     username: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+
+
+
+  useEffect(() => {
+    // Update the endpoint to match the Flask route
+const fetchEmailDetails = async () => {
+  try {
+    const response = await fetch('/emaildecrypt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(token),
+    });
+
+      if (response.ok) {
+          const data = await response.json();
+          setEmail(data.email);
+      } else {
+          console.error(`Error: ${response.status}`);
+      }
+  } catch (error) {
+      console.error("Error fetching exam details:", error);
+  } 
+};
+
+  
+      fetchEmailDetails();
+    
+  }, []); // Run once on component mount
+  
+
 
   useEffect(() => {
     // Set the username from the email prop when the component mounts
@@ -43,6 +82,8 @@ const ChangePassword = () => {
       console.log(data); // Log or handle the server response
     } catch (error) {
       console.error('Error changing password:', error);
+    } finally{
+      navigate("/login")
     }
   };
 
@@ -56,7 +97,6 @@ const ChangePassword = () => {
           type="text"
           name="username"
           value={email}
-          readOnly // Make the input read-only to prevent user modification
         />
 
         <label>Current Password:</label>
