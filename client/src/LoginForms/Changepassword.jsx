@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
+import './Changepassword.css'
 
 
 const ChangePassword = () => {
@@ -88,43 +89,54 @@ const fetchEmailDetails = async () => {
   };
 
   return (
-    <div>
-        <br></br><br></br><br></br><br></br><br></br><br></br><br></br><br></br>
-      <h2>Change Password</h2>
+    <div className='change'>
+      <div className="changepw">
+          <div className="changepw-box">
+          <h2>Change Password</h2>
       <form onSubmit={handleSubmit}>
+       
+       <div className="form-item">
         <label>Username:</label>
-        <input
-          type="text"
-          name="username"
-          value={email}
-        />
+          <input
+            type="text"
+            name="username"
+            value={email}
+          />
+       </div>
 
-        <label>Current Password:</label>
-        <input
-          type="password"
-          name="currentPassword"
-          value={formData.currentPassword}
-          onChange={handleInputChange}
-        />
+        <div className="form-item">
+          <label>Current Password:</label>
+          <input
+            type="password"
+            name="currentPassword"
+            value={formData.currentPassword}
+            onChange={handleInputChange}
+          />
+        </div>
 
-        <label>New Password:</label>
-        <input
-          type="password"
-          name="newPassword"
-          value={formData.newPassword}
-          onChange={handleInputChange}
-        />
+        <div className="form-item">
+          <label>New Password:</label>
+          <input
+            type="password"
+            name="newPassword"
+            value={formData.newPassword}
+            onChange={handleInputChange}
+          />
+        </div>
 
-        <label>Confirm Password:</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleInputChange}
-        />
-
+        <div className="form-item">
+          <label>Confirm Password:</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+          />
+        </div>
         <button type="submit">Change Password</button>
       </form>
+          </div>
+      </div>
     </div>
   );
 };

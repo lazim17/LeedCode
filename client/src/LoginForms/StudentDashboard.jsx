@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import TokenContext from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import './Dashboard.css'
 
 const AppliedExamCard = ({ appliedExam }) => {
   const { role, name, examstart } = appliedExam;
@@ -20,8 +21,9 @@ const AppliedExamCard = ({ appliedExam }) => {
   };
 
   return (
-    <div style={{ border: '1px solid #ddd', padding: '10px', margin: '10px', cursor: 'pointer' }}>
+    <div className="exam-card-student">
       <h3>{role}</h3>
+      <div className="card-details">
       <p>
         <span>Company: </span>
         {name}
@@ -33,6 +35,7 @@ const AppliedExamCard = ({ appliedExam }) => {
       <button onClick={handleStartExam} disabled={!isExamStarted}>
         Start Exam
       </button>
+      </div>
     </div>
   );
 };
@@ -76,21 +79,25 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="body">
+    <div className="body dashbg">
+      <div className="dashboard">
       <h1>student</h1>
       <h3>Welcome {localStorage.getItem("Username")} </h3>
 
-      <div>
+      <div className="exam-student">
         <h1>Applied Exams</h1>
-        {appliedExams.length > 0 ? (
-          <div>
-            {appliedExams.map((appliedExam, index) => (
-              <AppliedExamCard key={index} appliedExam={appliedExam} />
-            ))}
-          </div>
-        ) : (
-          <p>No applied exams available.</p>
-        )}
+        <div>
+          {appliedExams.length > 0 ? (
+            <div className="exam-grid">
+              {appliedExams.map((appliedExam, index) => (
+                <AppliedExamCard key={index} appliedExam={appliedExam} />
+              ))}
+            </div>
+          ) : (
+            <p>No applied exams available.</p>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   );

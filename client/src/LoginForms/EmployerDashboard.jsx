@@ -1,6 +1,7 @@
 import React, { useContext, useEffect,useState } from "react";
 import TokenContext from "../context/AuthProvider";
 import { useNavigate,Link} from "react-router-dom";
+import "./Dashboard.css"
 
 
 const ExamCard = ({ exam, employerId, onClick }) => {
@@ -80,10 +81,11 @@ const fetchExamDetails = async () => {
   
   return (
     <div className="body">
-        <h1>admin</h1>
+      <div className="dashboard">
+      <div className="welcome-box">
+      <h1>admin</h1>
       <h3>Welcome {username} </h3>
-      <br></br><br></br><br></br>
-
+      </div>
       <div>
       <h1>Exam Details</h1>
       {examDetails.length > 0 ? (
@@ -99,7 +101,7 @@ const fetchExamDetails = async () => {
       {selectedExam && (
         <div>
           <h2>{selectedExam.role} Details</h2>
-          <p>Exam ID: {selectedExam.exam_id.toString()}</p>
+          <p><b>Exam ID: </b>{selectedExam.exam_id.toString()}</p>
           <h3>Questions</h3>
           {selectedExam.questions.map((question, index) => (
             <div key={index}>
@@ -111,6 +113,7 @@ const fetchExamDetails = async () => {
           ))}
         </div>
       )}
+      </div>
     </div>
     </div>
   );

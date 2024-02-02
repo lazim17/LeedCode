@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import './Registration.css'
 
 const Registration = () => {
   const { employerId, examid } = useParams();
@@ -30,7 +31,6 @@ const Registration = () => {
           "Content-Type": "application/json",
         },
       });
-  
       if (response.ok) {
         console.log("Application submitted successfully");
         // Optionally, you can navigate to another page or show a success message.
@@ -45,34 +45,39 @@ const Registration = () => {
   };
 
   return (
-    <div>
-      <br></br><br></br><br></br><br></br><br></br><br></br><br></br><br></br>
-      <h2>Registration Form for Exam {examid}</h2>
-      <form onSubmit={handleRegistration}>
-        <label>First Name:</label>
-        <input
-          type="text"
-          name="fname"
-          value={formData.fname}
-          onChange={handleInputChange}
-        />
+    <div className='register-form'>
+      <h2>Registration Form</h2>
+      <h3>Exam id: {examid}</h3>
+      <form onSubmit={handleRegistration()}>
+        <div className="form-item">
+          <label>First Name:</label>
+          <input
+            type="text"
+            name="fname"
+            value={formData.fname}
+            onChange={handleInputChange}
+          />
+        </div>
 
-        <label>Last Name:</label>
-        <input
-          type="text"
-          name="lname"
-          value={formData.lname}
-          onChange={handleInputChange}
-        />
+        <div className="form-item">
+          <label>Last Name:</label>
+          <input
+            type="text"
+            name="lname"
+            value={formData.lname}
+            onChange={handleInputChange}
+          />
+        </div>
 
-        <label>Email:</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-        />
-
+        <div className="form-item">
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+          />
+        </div>
         {/* Add more form fields as needed */}
 
         <button type="submit">Register</button>
