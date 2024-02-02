@@ -153,6 +153,7 @@ def formsubmit():
         new_question_ids = [ObjectId() for _ in questions]
 
         if existing_employer:
+            print(existing_employer)
             new_exam = {
                 "exam_id": new_exam_id,
                 "role": role,
@@ -265,6 +266,54 @@ def dashboard():
     except Exception as e:
         return jsonify({"message": str(e)}), 500
 
+
+from flask import jsonify
+from bson import ObjectId
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@app.route('/applicantdashboard', methods=['GET'])
+@jwt_required()
+def appdashboard():
+    try:
+        # Get the user identity from the JWT
+        user_id = get_jwt_identity()
+        print(user_id)
+
+        # Retrieve exam details for the user from the Applicant database
+        applicant = db['Applicants'].find_one({"_id": ObjectId(user_id)})
+
+        if applicant:
+            
+            exam_details = []
+            
+            # Iterate through the exam IDs in the applicant's document
+            for exam_id in applicant.get('exams', []):
+                # Retrieve exam details from the Employer database using the exam ID
+                employer_exam = db['Employer'].find_one(
+                    {"exams.exam_id": ObjectId(exam_id)},
+                    {"_id": 0, "name": 1, "exams.$": 1}
+                )
+                
+
+                # Append the relevant exam details to the list
+                if employer_exam and employer_exam.get('exams'):
+                    exam_details.append({
+                        "name": employer_exam.get('name', ''),
+                        "role": employer_exam['exams'][0]['role'],
+                        "examstart": employer_exam['exams'][0]['examstart']
+                    })
+
+            return jsonify({"appliedExams": exam_details})
+
+        return jsonify({"message": "Applicant not found"}), 404
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500
+        
+
+
+
 def temppassword(first_name, last_name):
     
     temp_password = f"{first_name.lower()}{last_name.lower()}{''.join(random.choices(string.ascii_letters + string.digits, k=6))}"
@@ -286,6 +335,8 @@ def emaildecrypt():
         return jsonify({'success': False, 'message': f'Error: {str(e)}'})
 
 
+
+
 @app.route('/studentregs', methods=['POST'])
 def apply():
     try:
@@ -297,46 +348,70 @@ def apply():
         fname = form_data.get('fname')
         lname = form_data.get('lname')
         email = form_data.get('email')
-        password = temppassword(fname, lname)  
-        token = serializer.dumps({'email': email, 'exp': 3600})
 
-        user_data = {
-            "username": email,
-            "password": password,
-            "role": "student",
-            "email": email,
-            "fname": fname,
-            "lname": lname
-        }
-        
-        employer_id = ObjectId(employer_id)
-        exam_id = ObjectId(exam_id)
+        # Check if the applicant with the given email already exists
+        existing_applicant = db['users'].find_one({"email": email})
 
-        user_insert_result = db['users'].insert_one(user_data)
-        new_user_id = user_insert_result.inserted_id
+        if existing_applicant:
+            # Applicant already exists, update relevant information
+            user_id = existing_applicant["_id"]
 
-        applicant_data = {
-            "user_id": new_user_id,
-        }
+            # Update the information in the Applicants collection
+            db['Applicants'].update_one(
+                {"_id": user_id},
+                {"$push": {"exams": ObjectId(exam_id)}}
+            )
 
-        db['Employer'].update_one(
-            {"exams.exam_id": exam_id},
-            {"$push": {"exams.$.applicants": new_user_id}}
-        )
+            # Update the information in the Employer collection
+            db['Employer'].update_one(
+                {"exams.exam_id": ObjectId(exam_id)},
+                {"$push": {"exams.$.applicants": user_id}}
+            )
+        else:
+            # Applicant doesn't exist, create new records
+            password = temppassword(fname, lname)
+            token = serializer.dumps({'email': email, 'exp': 3600})
 
-        
-        send_async_email.apply_async(args=[email,password,token,fname])
-        # Send the email
-        
+            user_data = {
+                "username": email,
+                "password": password,
+                "role": "student",
+                "email": email,
+                "fname": fname,
+                "lname": lname
+            }
 
+            user_insert = db['users'].insert_one(user_data)
+            new_user_id = user_insert.inserted_id
 
+            applicants_data = {
+                "_id": new_user_id,
+                "fname": fname,
+                "lname": lname,
+            }
+
+            # Insert a new record in the Applicants collection
+            applicants_insert = db['Applicants'].insert_one(applicants_data)
+
+            # Link the applicant to the specified exam in both the Applicants and Employer collections
+            db['Applicants'].update_one(
+                {"_id": new_user_id},
+                {"$push": {"exams": ObjectId(exam_id)}}
+            )
+
+            db['Employer'].update_one(
+                {"exams.exam_id": ObjectId(exam_id)},
+                {"$push": {"exams.$.applicants": new_user_id}}
+            )
+
+            # Send the email
+            send_async_email.apply_async(args=[email, password, token, fname])
 
         return jsonify({'success': True, 'message': 'User registered successfully'})
 
-       
-
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
+
 
 
 
