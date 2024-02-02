@@ -10,6 +10,7 @@ import ChangePassword from "./LoginForms/Changepassword";
 import Registration from "./LoginForms/Registration";
 import HomePage from "./Homepage/HomePage";
 import Generate from "./Generate/Generate";
+import Exam from "./CodeEditor/Exam"
 
 
 //Authentication Context
@@ -34,6 +35,8 @@ export default function App() {
           <Route path="/empdash" element={<EmployerDashboard />} />
           <Route path="/registerr/:employerId/:examid" element={<Registration />} />
           <Route path="/change-password/:token" element={<ChangePassword />} />
+          <Route path="/exam/:examid" element={<Exam />} />
+
 
 
 

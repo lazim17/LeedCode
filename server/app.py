@@ -298,6 +298,7 @@ def appdashboard():
                 # Append the relevant exam details to the list
                 if employer_exam and employer_exam.get('exams'):
                     exam_details.append({
+                        "examid":str(employer_exam['exams'][0]['exam_id']),
                         "name": employer_exam.get('name', ''),
                         "role": employer_exam['exams'][0]['role'],
                         "examstart": employer_exam['exams'][0]['examstart']

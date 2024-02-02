@@ -4,6 +4,8 @@
 /server/.venv
 /server/deleteall.py
 /server/delete.py
+/server/__pycache__
+
 
 #user-code files
 /server/*.java

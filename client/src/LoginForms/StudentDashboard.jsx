@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import './Dashboard.css'
 
 const AppliedExamCard = ({ appliedExam }) => {
-  const { role, name, examstart } = appliedExam;
+  const { role, name, examstart, examid } = appliedExam;
   const [isExamStarted, setIsExamStarted] = useState(false);
+  const navigate = useNavigate(); // Add useNavigate hook
 
   useEffect(() => {
     // Check if the current date is past the examstart date
@@ -16,25 +17,24 @@ const AppliedExamCard = ({ appliedExam }) => {
   }, [examstart]);
 
   const handleStartExam = () => {
-    // Add logic to navigate or perform actions when the "Start Exam" button is clicked
-    console.log("Start Exam clicked!");
+    navigate(`/exam/${examid}`);
   };
 
   return (
     <div className="exam-card-student">
       <h3>{role}</h3>
       <div className="card-details">
-      <p>
-        <span>Company: </span>
-        {name}
-      </p>
-      <p>
-        <span>Date: </span>
-        {examstart}
-      </p>
-      <button onClick={handleStartExam} disabled={!isExamStarted}>
-        Start Exam
-      </button>
+        <p>
+          <span>Company: </span>
+          {name}
+        </p>
+        <p>
+          <span>Date: </span>
+          {examstart}
+        </p>
+        <button onClick={() => handleStartExam()} disabled={!isExamStarted}>
+          Start Exam
+        </button>
       </div>
     </div>
   );
