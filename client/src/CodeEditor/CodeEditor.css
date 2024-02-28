@@ -54,23 +54,21 @@ h3{
   width: 5vw;
   height: 80vh;
   background-color: #90AC95;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: 0%;
   position: fixed;
   border-radius: 25px 0 0 25px;
+  overflow-y: scroll;
+  text-align: center;
 }
 .question-sidebar button{
   font-family: 'Quicksand';
   background-color: #2A2D1E;
   color: #90AC95;
-  width:2rem;
-  height: 2rem;
+  width:3rem;
+  height: 3rem;
   border: none;
   border-radius: 50%;
-  margin: 2.5vh 0;
+  margin: 1rem 0 1rem 0;
 }
 .question-sidebar button:hover{
   cursor: pointer;

@@ -1,10 +1,13 @@
 .dashboard{
     width: 94vw;
     padding: 0 3vw;
-    margin-top: -15vh;
-    padding-top: 15vh;
+    margin-top: -10dvh;
+    padding-top: 15dvh;
+    height: 85vh;
     background-color: #d9d9d9;
+    overflow-y: scroll;
 }
+
 .welcome-box{
     padding: 2rem 0;
 }

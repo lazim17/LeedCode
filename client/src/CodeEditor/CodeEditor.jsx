@@ -27,6 +27,11 @@ const CodeEditor = () => {
     },
   });
 
+  //Editor Setup Logic
+  console.log(data)
+  const length = data.question.length
+  const [selquest,setselQuest] = useState(0)
+
   const compileCode = async () => {
     if (selectedLanguage) {
       try {
@@ -97,20 +102,17 @@ const CodeEditor = () => {
       <div className="canvas">
         <div className="question-container">
         <div className="question-sidebar">
-              <button>1</button>
-              <button>2</button>
-              <button>3</button>
-              <button>4</button>
-              <button>5</button>
-              <button>6</button>
+              {[...Array(length)].map((item,index)=>{
+                return(
+                  <button onClick={()=>{setselQuest(index)}}>{index+1}</button>
+                )
+              })}
           </div>
           <div className="question">
           <h3>Question Title</h3>
           <h4>Problem</h4>
           <p>
-            Given a square matrix, calculate the absolute difference between the
-            sums of its diagonals. For example, the square matrix is shown
-            below:
+            {data.question[selquest]}
           </p>
           <h4>Function Description</h4>
           <p>
@@ -118,30 +120,22 @@ const CodeEditor = () => {
             sums of its diagonals. For example, the square matrix is shown
             below:
           </p>
-          <h4>Return</h4>
-          <p>
-            Given a square matrix, calculate the absolute difference between the
-            sums of its diagonals. For example, the square matrix is shown
-            below:
-          </p>
-          <h4>Input Format</h4>
-          <p>
-            Given a square matrix, calculate the absolute difference between the
-            sums of its diagonals. For example, the square matrix is shown
-            below:
-          </p>
+          <h4>Examples</h4>
+            {data.examples[selquest].split("-").map((item)=>{
+              return(
+                <p>
+                  {item}
+                </p>
+              )
+            })}
           <h4>Constraints</h4>
-          <p>
-            Given a square matrix, calculate the absolute difference between the
-            sums of its diagonals. For example, the square matrix is shown
-            below:
-          </p>
-          <h4>Constraints</h4>
-          <p>
-            Given a square matrix, calculate the absolute difference between the
-            sums of its diagonals. For example, the square matrix is shown
-            below:
-          </p>
+            {data.constraints[selquest].split("-").map((item)=>{
+              return(
+                <p>
+                  {item}
+                </p>
+              )
+            })}
           </div>
         </div>
         <div>
