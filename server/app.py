@@ -485,6 +485,50 @@ def change_password():
         return jsonify({'success': False, 'message': str(e)})
 
 
+@app.route('/codeeditorinput',methods=['POST'])
+def codeeditorinput():
+    data = request.get_json()
+    exam=data.get('examid')
+    employer = db['Employer'].find_one(
+                    {"exams.exam_id": ObjectId(exam)},
+                    {"exams.$": 1}
+                )
+    formatted = []
+
+    if employer:
+        questions = None
+        for ex in employer['exams']:
+            if str(exam)==str(ex['exam_id']):
+                questions = ex['questions']
+                break
+        if questions:
+            # Randomly select 6 questions
+            random_questions = random.sample(questions, min(6, len(questions)))
+
+            # Prepare response
+            response_data = {
+                'questions': random_questions
+            }
+            
+            for item in questions:
+                item['question_id'] = str(item['question_id'])
+
+            ids = [item['question_id'] for item in questions]
+            question = [item['text'] for item in questions]
+            examples = [item['examples'] for item in questions]
+            constraints = [item['constraints'] for item in questions]
+
+            return jsonify({'ids':ids,'question':question,'examples':examples,'constraints':constraints}), 200
+        else:
+            return jsonify({'message': 'Questions not found for the exam'}), 404
+    else:
+        print("kitteeela")
+        return jsonify({'message': 'Exam not found'}), 404
+    
+
+
+
+
 #CODE-EDITOR
 @app.route('/run', methods=['POST'])
 def run_code():

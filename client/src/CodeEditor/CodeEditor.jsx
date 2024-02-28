@@ -3,6 +3,7 @@ import MonacoEditor from "react-monaco-editor";
 import axios from "axios";
 import "./CodeEditor.css";
 import * as monaco from 'monaco-editor';
+import { useLocation } from 'react-router-dom';
 
 const CodeEditor = () => {
   const [code, setCode] = useState("");
@@ -10,6 +11,8 @@ const CodeEditor = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [error, setError] = useState("");
   const [compilationMessage, setCompilationMessage] = useState("");
+  const location = useLocation();
+  const data = location.state ? location.state.data : null;
 
 
   monaco.editor.defineTheme('myTheme', {
@@ -18,7 +21,6 @@ const CodeEditor = () => {
     rules: [
       { token: 'comment', foreground: '008000' }, // Define the color for comments
       { token: 'string', foreground: '800000' },  // Define the color for strings
-      // Add more token rules as needed
     ],
     colors: {
       'editor.background': '#B9C2C6', // Set the editor background color

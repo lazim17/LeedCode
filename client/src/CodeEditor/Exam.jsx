@@ -1,12 +1,27 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
+
 
 const Exam = () => {
   const { examid } = useParams();
+  const navigate = useNavigate();
+  const handleBeginExam = async () => {
+    const response = await fetch("/codeeditorinput", {
+      method: "POST",
+      body: JSON.stringify({
+        examid
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    if(response.ok){
 
-  const handleBeginExam = () => {
-    console.log(`Begin Exam clicked for Exam ID: ${examid}`);
-    // Add any additional logic or redirect as needed
+      const data = await response.json()
+      navigate('/question',{state:{data}})
+    }else{
+      console.log("oombii")
+    }
   };
 
   return (
